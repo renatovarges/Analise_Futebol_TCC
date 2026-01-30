@@ -1,0 +1,54 @@
+# Plano de Design: Gerador de Infográficos de Alta Fidelidade
+
+## A "Conversa Séria" - Viabilidade
+**É viável?** SIM.
+**Fica idêntico ao Photoshop?** 95%.
+**Onde está a diferença?** Texturas complexas (papel amassado no fundo) precisam ser fornecidas como imagem de `background`. Degradês de fonte ou efeitos de sombra muito específicos são difíceis.
+**O que conseguimos fazer perfeitamente:**
+- Layout, posicionamento e proporções.
+- Tabelas com "Heatmap" (cores que mudam conforme o valor: Vermelho -> Amarelo -> Verde).
+- Inserção de logos e rodapés.
+- Tipografia limpa e profissional.
+
+## O Novo Fluxo (Graphic Renderer)
+Não usaremos o exportador nativo do Streamlit (que é fraco). Criaremos um "Artista Robô" (`graphic_renderer.py`).
+
+### 1. Preparação (Assets)
+O usuário precisará colocar na pasta do projeto:
+- `logo_top_left.png` (Logo TCC)
+- `logo_top_right.png` (Logo Renato)
+- `background.png` (Opcional: Aquela textura de papel branco/cinza do fundo). Se não tiver, faremos fundo branco sólido.
+
+### 2. Estrutura da Arte (Canvas)
+Usaremos `matplotlib` para criar uma figura de proporção vertical (tipo A4 ou Story de Instagram, conforme a imagem referência parece ser vertical).
+
+- **Cabeçalho:**
+    - Carregar e posicionar Logo Esq e Logo Dir.
+    - Faixa Verde Central com Texto: "ANÁLISE XG E XGA – RODADA {X}".
+- **Corpo (Tabelas):**
+    - Desenhar Tabela 1 (Mandantes) e Tabela 2 (Visitantes).
+    - **Estilização Fina:**
+        - Fonte: Sans-serif bold (tipo Arial/Helvetica ou DejaVu Sans).
+        - **Células de Valor (Heatmap):**
+            - GP: Escala Verde (Quanto mais, melhor).
+            - xG, xGA: Escala Verde/Vermelha CONDICIONAL.
+                - xG Pro (Ataque): Verde Alto, Vermelho Baixo.
+                - xGA (Defesa): Vermelho Alto, Verde Baixo.
+        - **Escudos dos Times:** *Desafio.* O código precisaria ter os escudos de todos os 20 times salvos numa pasta `escudos/`. **Plano B (Imediato):** Usar o NOME do time em texto. Se o usuário tiver os escudos, podemos implementar depois. Na referência tem os escudos.
+- **Rodapé:**
+    - Faixa Verde Escura.
+    - Texto: "MATERIAL EXCLUSIVO DO TCC".
+    - Logo Menor (se houver).
+
+### 3. Integração
+- No [app.py](file:///C:/Users/User/.gemini/antigravity/brain/7ed2b754-3f8b-47a6-9f43-61430dfd9425/app.py), um botão "GERAR ARTES FINAIS".
+- Ele processa os dados, chama o `graphic_renderer`, cria o PNG em memória e oferece para download.
+
+## O Que Preciso do Usuário Agora
+1.  Confirmação de que ele pode fornecer os Logos (e idealmente o fundo).
+2.  Decisão sobre os **Escudos**: Ele tem os arquivos [.png](file:///C:/Users/User/.gemini/antigravity/brain/7ed2b754-3f8b-47a6-9f43-61430dfd9425/uploaded_media_1769733540125.png) dos escudos dos times nomeados certinho (ex: `corinthians.png`, `bahia.png`)? Se não, faremos com texto primeiro.
+
+## Plano de Ação Imediata
+1.  Criar pasta `assets/` e `assets/logos`.
+2.  Criar `graphic_renderer.py` com um protótipo desse layout.
+3.  Gerar uma imagem de teste para ele validar a "vibe".

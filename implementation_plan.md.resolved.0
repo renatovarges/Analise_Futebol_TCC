@@ -1,0 +1,70 @@
+# Plano de Implementação: Ferramenta de Análise xG/xGA (TCC)
+
+## Objetivo
+Criar uma aplicação web local (que poderá ser hospedada futuramente) para transformar dados brutos de planilhas CSV em tabelas de análise estatística de xG/xGA com design premium e rigor editorial absoluto.
+
+## Filosofia do Projeto
+- **Rigor Editorial**: Zero inferência. O dado da planilha é a verdade absoluta.
+- **Determinismo**: A ordenação é sempre por DATA, ignorando a ordem numérica da rodada para cálculos de média (para lidar com jogos adiados/antecipados corretamente).
+- **Auditabilidade**: Cada número gerado deve ser rastreável até os jogos que o compuseram (Arte de Evidências).
+
+## Arquitetura
+- **Frontend**: Aplicação Web Simples e Responsiva (HTML + CSS + JS puro ou estrutura leve).
+- **Processamento**: JavaScript no navegador (Client-side) para garantir privacidade e rapidez, ou Python (Backend) se a complexidade exigir bibliotecas específicas como Pandas (neste caso, Python é preferível dada a natureza da análise de dados do usuário e script anterior).
+    - *Decisão*: Vamos usar **Python** com **Streamlit** ou **Flask** localmente. Por quê? O usuário já tem familiaridade com scripts Python (do Colab), e o Python é imbatível para garantir a precisão matemática e manipulação de DataFrames com Pandas, além de facilitar a criação de filtros robustos.
+- **Entrada**: Upload de arquivo CSV/Excel.
+- **Saída**: Visualização na tela + Download de PNGs em alta resolução.
+
+## Estrutura de Dados (Conforme Especificação Mestre)
+A aplicação deve respeitar estritamente as colunas:
+- `Rodada`, `Data`, `Time Casa`, `Time Visitante`, `Placar`, `xG Casa`, `xG Visitante`.
+
+## Funcionalidades Principais
+
+### 1. Upload e Leitura
+- Ler o arquivo `.csv` ou `.xlsx`.
+- Validar se as colunas obrigatórias existem.
+- Ordenar todo o dataset por DATA (Decrescente ou Crescente conforme necessidade de busca).
+
+### 2. Configuração da Análise (Sidebar/Menu)
+- **Seleção da Rodada Alvo**: Menu dropdown com as rodadas disponíveis.
+    - Ao selecionar a rodada, o sistema identifica automaticamente os 10 confrontos.
+- **Seleção de N (Recorte)**: Input numérico (ex: últimos 3, 5, 10 jogos).
+- **Filtro de Mando**:
+    - `TODOS`: Pega os últimos N jogos independentemente do mando.
+    - `POR_MANDO` (Padrão):
+        - Para o Mandante do confronto atual -> Pega últimos N jogos EM CASA.
+        - Para o Visitante do confronto atual -> Pega últimos N jogos FORA.
+
+### 3. Motor de Cálculo (Core)
+Para cada confronto da rodada selecionada (Time A vs Time B):
+
+**Para o Time A (Mandante na rodada alvo):**
+- Filtrar jogos anteriores à data do confronto atual.
+- Aplicar o filtro de mando (apenas jogos em casa se FILTRO=POR_MANDO).
+- Pegar os últimos N jogos ordenados por data.
+- Calcular:
+    - `GP` (Soma)
+    - `GS` (Soma)
+    - `SG Conquistado` (Count jogos onde GS=0)
+    - `SG Cedido` (Count jogos onde GP=0) - *Nota: "SG Cedido" geralmente é "jogos que não marcou", verificar nomenclatura usual do usuário. Na tabela enviada está "SG ced", que no contexto de ataque (soma GP) parece ser "Jogos que passou em branco". Vamos confirmar se "SG Cedido" é Clean Sheet do ADVERSÁRIO (time não marcou).*
+    - `xG` (Média Simples)
+    - `xGA` (Média Simples)
+
+**Para o Time B (Visitante na rodada alvo):**
+- Mesma lógica, espelhando os filtros.
+
+### 4. Geração Visual (Design Premium)
+- Criar templates HTML/CSS que renderizam as tabelas exatamente como no exemplo (mas com design aprimorado/moderno).
+- **Tabela 1 (Mandantes)**: Foco no Mandante x Visitante.
+- **Tabela 2 (Visitantes)**: View espelhada.
+- **Formatacao Condicional**: Cores de escala (heatmap) para valores altos/baixos de xG/xGA para facilitar leitura rápida (verde = bom, vermelho = ruim, ou escalas de intensidade).
+
+## Próximos Passos (Plano de Ação)
+1.  **Criar o Script de Processamento (Python)**: Implementar a lógica "inviolável" descrita.
+2.  **Validar com Dados de Teste**: Criar um CSV dummy ou usar o do usuário para garantir que o cálculo bate.
+3.  **Desenvolver Interface Visual**: Criar o frontend.
+4.  **Integração e Geração de PNG**: Implementar a função de "baixar como imagem".
+
+## Perguntas para o Usuário (Se necessário)
+- "SG ced" na sua tabela significa "Jogos em que o time não marcou gol" (Clean sheet cedido ao goleiro adversário)? Pela lógica de ataque, sim.

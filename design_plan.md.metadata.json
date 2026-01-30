@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Plano ultra-detalhado para o 'Gerador de Infográficos'. Foca na viabilidade de criar artes finais via código. Define a estrutura de arquivos (pasta assets para logos) e a lógica de desenho (Canvas Matplotlib com subplots para tabelas e imagens para logos). Inclui a aplicação de 'Color Maps' para o efeito degradê nas células.",
+  "updatedAt": "2026-01-30T01:16:30.142269800Z"
+}

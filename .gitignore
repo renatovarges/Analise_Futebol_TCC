@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+.env
+
+# Streamlit
+.streamlit/
+
+# App específico
+*.csv
+*.xlsx
+*.png
+!assets/logos/background.png
+!assets/logos/logo tcc.png
+!assets/logos/logo tcc branco.png
+!assets/teams/*.png
+
+# Meus arquivos de debug/teste
+surgical_inspect*.py
+column_mapper.py
+gen_reqs.py
+debug_*.py
+inspect_*.py
+reproduce_*.py
+strict_*.py
+clear_cache.py
+validate_*.webp
+*.bat
+*.png
+Analise_*.png
+infografico_teste.png
+!README.md

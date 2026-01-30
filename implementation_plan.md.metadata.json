@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Atualização do plano para remover a filtragem por número de rodada e reforçar a comparação de datas. A regra de ouro é: Histórico = Jogos onde Data < Data do Confronto Alvo. Isso permite que jogos antecipados (ex: R3 jogada antes da R2) entrem corretamente no cálculo, como desejado.",
+  "updatedAt": "2026-01-29T23:46:14.036625Z",
+  "version": "1"
+}

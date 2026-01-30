@@ -1,0 +1,64 @@
+# Manual de Uso: XG Master (Análise de Futebol)
+
+Sua ferramenta personalizada de análise estatística está pronta! 
+Focamos em **simplicidade** e **rigor matemático**, como você pediu.
+
+## 🚀 Como Iniciar
+
+Criei um atalho simples para você. Na pasta onde estão os arquivos, você verá um arquivo chamado:
+
+👉 [INICIAR_FERRAMENTA.bat](file:///C:/Users/User/.gemini/antigravity/brain/7ed2b754-3f8b-47a6-9f43-61430dfd9425/INICIAR_FERRAMENTA.bat)
+
+Basta dar **duplo clique** nele.
+Isso abrirá automaticamente uma janela preta (terminal) e, em seguida, **abrirá o seu navegador** com a ferramenta pronta para uso.
+
+---
+
+## 🖥️ A Interface
+
+### 1. Carregamento de Dados (Sidebar Lateral)
+No menu esquerdo, você tem duas opções:
+- **Carregar Planilha**: Clique em "Browse files" para subir sua planilha `.csv` ou `.xlsx` atualizada.
+- **Usar Planilha Padrão**: Se não carregar nada, o sistema busca automaticamente o arquivo `PLANILHA PREENCHIMENTO DE XG E XGA.csv` que já está na pasta.
+
+### 2. Configuração da Análise
+Ainda no menu esquerdo, configure:
+- **Recorte (N Jogos)**: Escolha quantos jogos recentes analisar (Ex: 3, 5, 10...).
+- **Tipo de Filtro**:
+    - `POR MANDO` (Recomendado): O sistema analisa o mandante jogando apenas EM CASA e o visitante apenas FORA.
+    - `TODOS`: Analisa a forma geral do time (casa e fora misturados).
+- **Rodada Alvo**: Selecione qual rodada do campeonato você quer analisar.
+
+### 3. As Tabelas (Ouro)
+O sistema gera duas tabelas principais:
+
+#### 🏠 Tabela Superir: FOCO NO MANDANTE
+Responde à pergunta: *"Quão forte é o ataque deste Mandante contra a defesa deste Visitante fora de casa?"*
+- Mostra o **xG Casa** (Médio) do Mandante.
+- Mostra o **xGA Fora** (Médio) do Visitante.
+
+#### ✈️ Tabela Inferior: FOCO NO VISITANTE
+Responde à pergunta: *"O Visitante consegue agredir a defesa do Mandante?"*
+- Mostra o **xG Fora** do Visitante.
+- Mostra o **xGA Casa** do Mandante.
+
+---
+
+## ⚠️ Detalhes Importantes (Rigor Editorial)
+
+1. **"SG Cedido"**:
+   - Seguindo sua instrução, a coluna "SG ced" conta quantas vezes o time **NÃO MARCOU GOLS** (passou em branco).
+   
+2. **"Zeros" na Tabela**:
+   - Como estamos no início do campeonato (Rodada 2 simulada), é normal ver muitos zeros. Se você filtrar "Últimos 3 jogos EM CASA" para um time que só jogou 1 vez em casa até agora, a matemática é feita com esse único jogo.
+   
+3. **Ordenação**:
+   - Todo cálculo respeita estritamente a **DATA**. Jogos futuros ou sem data válida são ignorados.
+   
+4. **Proteção Contra Jogos Adiados (NOVO)**:
+   - Se um jogo da Rodada 2 for adiado para depois da Rodada 3, o sistema entende isso! Ao analisar a Rodada 2, ele **ignora automaticamente** qualquer jogo da Rodada 3 ou superior, garantindo que você veja o cenário do campeonato "naquela época", e não dados do futuro. Blindagem total.
+
+---
+
+### Dúvidas ou Ajustes?
+A ferramenta é sua! Se quiser mudar cores, nomes de colunas ou lógica, é só avisar.
