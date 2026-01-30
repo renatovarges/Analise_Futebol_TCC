@@ -4,6 +4,37 @@ import data_processor
 import graphic_renderer
 import os
 
+# --- DEBUG DE DEPLOY RADICAL ---
+import os
+from pathlib import Path
+import streamlit as st
+
+def deploy_check():
+    print(f"=== INICIANDO CONFERÊNCIA DE ARQUIVOS (SERVIDOR) ===")
+    cwd = Path.cwd()
+    base = Path(__file__).resolve().parent
+    print(f"Diretório Atual: {cwd}")
+    print(f"Diretório do App: {base}")
+    
+    # Caminho esperado dos assets
+    assets_path = base / "assets"
+    if assets_path.exists():
+        print(f"PASTA ASSETS ENCONTRADA: {assets_path}")
+        # Listar subpastas cruciais
+        for sub in ["logos", "teams"]:
+            p = assets_path / sub
+            if p.exists():
+                files = list(p.glob("*.png"))
+                print(f"  -> {sub}: {len(files)} arquivos encontrados.")
+            else:
+                print(f"  -> ERRO: Pasta '{sub}' NÃO encontrada em {p}!")
+    else:
+        print(f"ERRO CRÍTICO: Pasta 'assets' NÃO encontrada em {assets_path}!")
+        print(f"Arquivos na raiz: {list(base.glob('*'))}")
+
+deploy_check()
+# --- FIM DEBUG ---
+
 # Configuração da Página - Modo Wide para caber as tabelas
 st.set_page_config(page_title="Análise xG/xGA Brasileirão", layout="wide")
 

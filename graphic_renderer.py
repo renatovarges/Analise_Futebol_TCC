@@ -7,18 +7,21 @@ import pandas as pd
 import os
 import unicodedata
 
+from pathlib import Path
+
 # --- CONFIGURAÇÕES DE DIRETÓRIOS ---
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ASSETS_DIR = os.path.join(BASE_DIR, "assets")
-FONTS_DIR = os.path.join(ASSETS_DIR, "fonts")
-LOGOS_DIR = os.path.join(ASSETS_DIR, "logos")
-TEAMS_DIR = os.path.join(ASSETS_DIR, "teams")
+# Usando Pathlib para garantir que os caminhos funcionem em Windows e Linux (Streamlit Cloud)
+BASE_DIR = Path(__file__).resolve().parent
+ASSETS_DIR = BASE_DIR / "assets"
+FONTS_DIR = ASSETS_DIR / "fonts"
+LOGOS_DIR = ASSETS_DIR / "logos"
+TEAMS_DIR = ASSETS_DIR / "teams"
 
 # --- CARREGAR FONTE ---
 try:
     font_files = [f for f in os.listdir(FONTS_DIR) if f.lower().endswith(('.ttf', '.otf'))]
     if font_files:
-        font_path = os.path.join(FONTS_DIR, font_files[0])
+        font_path = FONTS_DIR / font_files[0]
         prop = fm.FontProperties(fname=font_path)
     else:
         prop = fm.FontProperties(family='sans-serif', weight='bold')
@@ -54,35 +57,54 @@ def get_conditional_color(value, column_values, higher_is_better=True):
         return "#FFFFFF"
 
 def sanitize_name(name):
-    """Remove acentos e espaços para compatibilidade com servidores Linux."""
-    if not isinstance(name, str): return ""
+    """Remove acentos e espaços para compatibilidade com arquivos."""
+    if not name: return ""
     import unicodedata
-    n = unicodedata.normalize('NFKD', name).encode('ASCII', 'ignore').decode('ASCII')
-    return n.lower().replace(" ", "_")
-
-TEAM_MAP = {
-    "Athletico Paranaense": "athletico-pr", "Atlético Mineiro": "atletico_mg", "Bahia": "bahia",
-    "Botafogo (RJ)": "botafogo", "Chapecoense": "chapecoense", "Corinthians": "corinthians",
-    "Coritiba": "coritiba", "Cruzeiro": "cruzeiro", "Flamengo": "flamengo",
-    "Fluminense": "fluminense", "Grêmio": "gremio", "Internacional": "internacional",
-    "Mirassol": "mirassol", "Palmeiras": "palmeiras", "RB Bragantino": "red_bull_bragantino",
-    "Red Bull Bragantino": "red_bull_bragantino", "Remo": "remo", "Santos": "santos",
-    "São Paulo": "sao_paulo", "Vasco da Gama": "vasco", "Vasco": "vasco", "Vitória": "vitoria"
-}
+    n = unicodedata.normalize('NFKD', str(name)).encode('ASCII', 'ignore').decode('ASCII')
+    return n.lower().replace(" ", "_").replace("-", "_")
 
 def get_team_logo_path(team_name):
-    if team_name in TEAM_MAP:
-        path = os.path.join(TEAMS_DIR, f"{TEAM_MAP[team_name]}.png")
-        if os.path.exists(path): return path
-    # Fallback sanitizado
-    path = os.path.join(TEAMS_DIR, f"{sanitize_name(team_name)}.png")
-    return path if os.path.exists(path) else None
+    """Busca o escudo do time de forma flexível."""
+    if not team_name: return None
+    
+    # 1. Tentar Match Direto no Mapa (Suporta nomes truncados da planilha)
+    MAPA_SIMPLIFICADO = {
+        "atletico_m": "atletico_mg", "atletico": "atletico_mg", 
+        "botafogo": "botafogo", "chapeco": "chapecoense",
+        "bragant": "red_bull_bragantino", "red_bull": "red_bull_bragantino",
+        "vasco": "vasco", "vitoria": "vitoria", "gremio": "gremio", "palmeiras": "palmeiras",
+        "flamengo": "flamengo", "fluminense": "fluminense", "sao_paulo": "sao_paulo",
+        "santos": "santos", "cruzeiro": "cruzeiro", "bahia": "bahia", "inter": "internacional",
+        "corinth": "corinthians", "coritiba": "coritiba", "mirassol": "mirassol",
+        "remo": "remo", "athletico": "athletico-pr"
+    }
+    
+    sanitized = sanitize_name(team_name)
+    
+    # Verifica se algum termo do mapa está contido no nome do time
+    for key, filename in MAPA_SIMPLIFICADO.items():
+        if key in sanitized:
+            path = TEAMS_DIR / f"{filename}.png"
+            if path.exists(): return str(path)
+
+    # 2. Tentativa por nome sanitizado direto
+    path = TEAMS_DIR / f"{sanitized}.png"
+    if path.exists(): return str(path)
+    
+    # Debug no console do Streamlit
+    print(f"[LOG] Escudo não encontrado para: {team_name} (Sanitizado: {sanitized})")
+    return None
 
 def add_image(ax, path, x, y, zoom=0.1, zorder=10):
-    if not os.path.exists(path): return
-    img = mpimg.imread(path)
-    ab = AnnotationBbox(OffsetImage(img, zoom=zoom), (x, y), frameon=False, xycoords='axes fraction', zorder=zorder)
-    ax.add_artist(ab)
+    if not path or not Path(path).exists(): 
+        print(f"[LOG] Falha ao carregar imagem no path: {path}")
+        return
+    try:
+        img = mpimg.imread(path)
+        ab = AnnotationBbox(OffsetImage(img, zoom=zoom), (x, y), frameon=False, xycoords='axes fraction', zorder=zorder)
+        ax.add_artist(ab)
+    except Exception as e:
+        print(f"[LOG] Erro ao abrir imagem {path}: {e}")
 
 def generate_infographic(df_mandante, df_visitante, rodada_num, n_jogos, tipo_filtro):
     m_col = 'XG casa' if 'XG casa' in df_mandante.columns else 'xG casa'
@@ -100,12 +122,24 @@ def generate_infographic(df_mandante, df_visitante, rodada_num, n_jogos, tipo_fi
         fig.patch.set_facecolor(COLOR_BG)
     ax.set_axis_off()
 
+    # Fundo (Background)
+    bg_path = LOGOS_DIR / "background.png"
+    if bg_path.exists():
+        try:
+            ax.imshow(mpimg.imread(str(bg_path)), extent=[0, 1, 0, 1], aspect='auto', zorder=-1)
+        except Exception as e:
+            print(f"[LOG] Erro ao carregar fundo: {e}")
+            fig.patch.set_facecolor(COLOR_BG)
+    else:
+        print(f"[LOG] Fundo não encontrado em: {bg_path}")
+        fig.patch.set_facecolor(COLOR_BG)
+
     header_y = 0.94
     ax.add_patch(plt.Rectangle((0.2, header_y - 0.02), 0.6, 0.04, color=COLOR_HEADER_BG, transform=ax.transAxes))
     ax.text(0.5, header_y, f"ANÁLISE XG E XGA – RODADA {rodada_num}", ha="center", va="center", color="white", fontproperties=prop, fontsize=24, transform=ax.transAxes)
 
     # Logos do Cabeçalho - Ajustados para nomes sanitizados
-    logo_tcc_path = os.path.join(LOGOS_DIR, "logo_tcc.png")
+    logo_tcc_path = str(LOGOS_DIR / "logo_tcc.png")
     add_image(ax, logo_tcc_path, 0.1, header_y, zoom=0.07, zorder=15)
     add_image(ax, logo_tcc_path, 0.9, header_y, zoom=0.07, zorder=15)
 
@@ -187,11 +221,11 @@ def generate_infographic(df_mandante, df_visitante, rodada_num, n_jogos, tipo_fi
     ax.add_patch(plt.Rectangle((0, 0), 1, footer_h, color=COLOR_HEADER_BG, transform=ax.transAxes, zorder=20))
     ax.text(0.5, footer_h/2, "MATERIAL EXCLUSIVO DO TCC", ha="center", va="center", color="white", fontproperties=prop, fontsize=14, transform=ax.transAxes, zorder=21)
     
-    logo_tcc_branca = os.path.join(LOGOS_DIR, "logo_tcc_branco.png")
+    logo_tcc_branca = str(LOGOS_DIR / "logo_tcc_branco.png")
     add_image(ax, logo_tcc_branca, 0.1, footer_h/2, zoom=0.045, zorder=25)
     add_image(ax, logo_tcc_branca, 0.9, footer_h/2, zoom=0.045, zorder=25)
     
-    out = os.path.join(BASE_DIR, f"Analise_R{rodada_num}.png")
+    out = str(BASE_DIR / f"Analise_R{rodada_num}.png")
     plt.savefig(out, dpi=400, bbox_inches='tight') # DPI aumentado para 400
     plt.close()
     return out
