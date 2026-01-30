@@ -53,21 +53,29 @@ def get_conditional_color(value, column_values, higher_is_better=True):
     except (ValueError, TypeError):
         return "#FFFFFF"
 
+def sanitize_name(name):
+    """Remove acentos e espaços para compatibilidade com servidores Linux."""
+    if not isinstance(name, str): return ""
+    import unicodedata
+    n = unicodedata.normalize('NFKD', name).encode('ASCII', 'ignore').decode('ASCII')
+    return n.lower().replace(" ", "_")
+
 TEAM_MAP = {
-    "Athletico Paranaense": "athletico-pr", "Atlético Mineiro": "atlético mg", "Bahia": "bahia",
+    "Athletico Paranaense": "athletico-pr", "Atlético Mineiro": "atletico_mg", "Bahia": "bahia",
     "Botafogo (RJ)": "botafogo", "Chapecoense": "chapecoense", "Corinthians": "corinthians",
     "Coritiba": "coritiba", "Cruzeiro": "cruzeiro", "Flamengo": "flamengo",
     "Fluminense": "fluminense", "Grêmio": "gremio", "Internacional": "internacional",
-    "Mirassol": "mirassol", "Palmeiras": "palmeiras", "RB Bragantino": "red bull bragantino",
-    "Red Bull Bragantino": "red bull bragantino", "Remo": "remo", "Santos": "santos",
-    "São Paulo": "são paulo", "Vasco da Gama": "vasco", "Vasco": "vasco", "Vitória": "vitória"
+    "Mirassol": "mirassol", "Palmeiras": "palmeiras", "RB Bragantino": "red_bull_bragantino",
+    "Red Bull Bragantino": "red_bull_bragantino", "Remo": "remo", "Santos": "santos",
+    "São Paulo": "sao_paulo", "Vasco da Gama": "vasco", "Vasco": "vasco", "Vitória": "vitoria"
 }
 
 def get_team_logo_path(team_name):
     if team_name in TEAM_MAP:
         path = os.path.join(TEAMS_DIR, f"{TEAM_MAP[team_name]}.png")
         if os.path.exists(path): return path
-    path = os.path.join(TEAMS_DIR, f"{team_name.lower()}.png")
+    # Fallback sanitizado
+    path = os.path.join(TEAMS_DIR, f"{sanitize_name(team_name)}.png")
     return path if os.path.exists(path) else None
 
 def add_image(ax, path, x, y, zoom=0.1, zorder=10):
@@ -96,8 +104,8 @@ def generate_infographic(df_mandante, df_visitante, rodada_num, n_jogos, tipo_fi
     ax.add_patch(plt.Rectangle((0.2, header_y - 0.02), 0.6, 0.04, color=COLOR_HEADER_BG, transform=ax.transAxes))
     ax.text(0.5, header_y, f"ANÁLISE XG E XGA – RODADA {rodada_num}", ha="center", va="center", color="white", fontproperties=prop, fontsize=24, transform=ax.transAxes)
 
-    # Logos do Cabeçalho - Ajustados
-    logo_tcc_path = os.path.join(LOGOS_DIR, "logo tcc.png")
+    # Logos do Cabeçalho - Ajustados para nomes sanitizados
+    logo_tcc_path = os.path.join(LOGOS_DIR, "logo_tcc.png")
     add_image(ax, logo_tcc_path, 0.1, header_y, zoom=0.07, zorder=15)
     add_image(ax, logo_tcc_path, 0.9, header_y, zoom=0.07, zorder=15)
 
@@ -179,7 +187,7 @@ def generate_infographic(df_mandante, df_visitante, rodada_num, n_jogos, tipo_fi
     ax.add_patch(plt.Rectangle((0, 0), 1, footer_h, color=COLOR_HEADER_BG, transform=ax.transAxes, zorder=20))
     ax.text(0.5, footer_h/2, "MATERIAL EXCLUSIVO DO TCC", ha="center", va="center", color="white", fontproperties=prop, fontsize=14, transform=ax.transAxes, zorder=21)
     
-    logo_tcc_branca = os.path.join(LOGOS_DIR, "logo tcc branco.png")
+    logo_tcc_branca = os.path.join(LOGOS_DIR, "logo_tcc_branco.png")
     add_image(ax, logo_tcc_branca, 0.1, footer_h/2, zoom=0.045, zorder=25)
     add_image(ax, logo_tcc_branca, 0.9, footer_h/2, zoom=0.045, zorder=25)
     
