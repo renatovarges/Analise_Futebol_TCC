@@ -9,13 +9,26 @@ import unicodedata
 
 from pathlib import Path
 
+import io
+import base64
+from PIL import Image
+try:
+    from image_data import IMAGES
+except ImportError:
+    IMAGES = {}
+
+def get_image_from_base64(key):
+    """Converte string Base64 do banco de dados para objeto de imagem do Matplotlib/PIL."""
+    if key not in IMAGES: return None
+    try:
+        img_data = base64.b64decode(IMAGES[key])
+        return Image.open(io.BytesIO(img_data))
+    except:
+        return None
+
 # --- CONFIGURAÇÕES DE DIRETÓRIOS ---
-# Usando Pathlib para garantir que os caminhos funcionem em Windows e Linux (Streamlit Cloud)
+# (Mantidos apenas para compatibilidade, o foco agora é Base64)
 BASE_DIR = Path(__file__).resolve().parent
-ASSETS_DIR = BASE_DIR / "assets"
-FONTS_DIR = ASSETS_DIR / "fonts"
-LOGOS_DIR = ASSETS_DIR / "logos"
-TEAMS_DIR = ASSETS_DIR / "teams"
 
 # --- CARREGAR FONTE ---
 try:
@@ -64,10 +77,10 @@ def sanitize_name(name):
     return n.lower().replace(" ", "_").replace("-", "_")
 
 def get_team_logo_path(team_name):
-    """Busca o escudo do time de forma flexível."""
+    """Busca o escudo do time no banco de dados Base64."""
     if not team_name: return None
     
-    # 1. Tentar Match Direto no Mapa (Suporta nomes truncados da planilha)
+    # Mapa de nomes curtos para chaves do banco de dados
     MAPA_SIMPLIFICADO = {
         "atletico_m": "atletico_mg", "atletico": "atletico_mg", 
         "botafogo": "botafogo", "chapeco": "chapecoense",
@@ -80,31 +93,31 @@ def get_team_logo_path(team_name):
     }
     
     sanitized = sanitize_name(team_name)
-    
-    # Verifica se algum termo do mapa está contido no nome do time
     for key, filename in MAPA_SIMPLIFICADO.items():
         if key in sanitized:
-            path = TEAMS_DIR / f"{filename}.png"
-            if path.exists(): return str(path)
+            return f"team_{filename}"
 
-    # 2. Tentativa por nome sanitizado direto
-    path = TEAMS_DIR / f"{sanitized}.png"
-    if path.exists(): return str(path)
+    target = f"team_{sanitized}"
+    if target in IMAGES: return target
     
-    # Debug no console do Streamlit
-    print(f"[LOG] Escudo não encontrado para: {team_name} (Sanitizado: {sanitized})")
+    print(f"[LOG] Escudo não encontrado no DB para: {team_name}")
     return None
 
-def add_image(ax, path, x, y, zoom=0.1, zorder=10):
-    if not path or not Path(path).exists(): 
-        print(f"[LOG] Falha ao carregar imagem no path: {path}")
-        return
+def add_image(ax, key_or_img, x, y, zoom=0.1, zorder=10):
+    """Adiciona imagem ao gráfico usando a chave do banco Base64."""
+    img = None
+    if isinstance(key_or_img, str):
+        img = get_image_from_base64(key_or_img)
+    else:
+        img = key_or_img # Já é um objeto de imagem
+        
+    if img is None: return
+    
     try:
-        img = mpimg.imread(path)
         ab = AnnotationBbox(OffsetImage(img, zoom=zoom), (x, y), frameon=False, xycoords='axes fraction', zorder=zorder)
         ax.add_artist(ab)
     except Exception as e:
-        print(f"[LOG] Erro ao abrir imagem {path}: {e}")
+        print(f"[LOG] Erro ao renderizar imagem {key_or_img}: {e}")
 
 def generate_infographic(df_mandante, df_visitante, rodada_num, n_jogos, tipo_filtro):
     m_col = 'XG casa' if 'XG casa' in df_mandante.columns else 'xG casa'
@@ -122,26 +135,24 @@ def generate_infographic(df_mandante, df_visitante, rodada_num, n_jogos, tipo_fi
         fig.patch.set_facecolor(COLOR_BG)
     ax.set_axis_off()
 
-    # Fundo (Background)
-    bg_path = LOGOS_DIR / "background.png"
-    if bg_path.exists():
+    # Fundo (Background) via Base64
+    bg_img = get_image_from_base64("logo_background")
+    if bg_img:
         try:
-            ax.imshow(mpimg.imread(str(bg_path)), extent=[0, 1, 0, 1], aspect='auto', zorder=-1)
+            ax.imshow(bg_img, extent=[0, 1, 0, 1], aspect='auto', zorder=-1)
         except Exception as e:
             print(f"[LOG] Erro ao carregar fundo: {e}")
             fig.patch.set_facecolor(COLOR_BG)
     else:
-        print(f"[LOG] Fundo não encontrado em: {bg_path}")
         fig.patch.set_facecolor(COLOR_BG)
 
     header_y = 0.94
     ax.add_patch(plt.Rectangle((0.2, header_y - 0.02), 0.6, 0.04, color=COLOR_HEADER_BG, transform=ax.transAxes))
     ax.text(0.5, header_y, f"ANÁLISE XG E XGA – RODADA {rodada_num}", ha="center", va="center", color="white", fontproperties=prop, fontsize=24, transform=ax.transAxes)
 
-    # Logos do Cabeçalho - Ajustados para nomes sanitizados
-    logo_tcc_path = str(LOGOS_DIR / "logo_tcc.png")
-    add_image(ax, logo_tcc_path, 0.1, header_y, zoom=0.07, zorder=15)
-    add_image(ax, logo_tcc_path, 0.9, header_y, zoom=0.07, zorder=15)
+    # Logos do Cabeçalho - Usando DB Base64
+    add_image(ax, "logo_logo_tcc", 0.1, header_y, zoom=0.07, zorder=15)
+    add_image(ax, "logo_logo_tcc", 0.9, header_y, zoom=0.07, zorder=15)
 
     def draw_table(df, start_y, is_mandante):
         cols = ["TIME", "GP", "SG ced", "XG", "XGA", "SG conq", "GS", "ADV"]
@@ -221,9 +232,9 @@ def generate_infographic(df_mandante, df_visitante, rodada_num, n_jogos, tipo_fi
     ax.add_patch(plt.Rectangle((0, 0), 1, footer_h, color=COLOR_HEADER_BG, transform=ax.transAxes, zorder=20))
     ax.text(0.5, footer_h/2, "MATERIAL EXCLUSIVO DO TCC", ha="center", va="center", color="white", fontproperties=prop, fontsize=14, transform=ax.transAxes, zorder=21)
     
-    logo_tcc_branca = str(LOGOS_DIR / "logo_tcc_branco.png")
-    add_image(ax, logo_tcc_branca, 0.1, footer_h/2, zoom=0.045, zorder=25)
-    add_image(ax, logo_tcc_branca, 0.9, footer_h/2, zoom=0.045, zorder=25)
+    # Rodapé via Base64
+    add_image(ax, "logo_logo_tcc_branco", 0.1, footer_h/2, zoom=0.045, zorder=25)
+    add_image(ax, "logo_logo_tcc_branco", 0.9, footer_h/2, zoom=0.045, zorder=25)
     
     out = str(BASE_DIR / f"Analise_R{rodada_num}.png")
     plt.savefig(out, dpi=400, bbox_inches='tight') # DPI aumentado para 400
