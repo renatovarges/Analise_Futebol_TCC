@@ -154,11 +154,25 @@ if uploaded_file is not None:
             st.markdown("---")
             if st.button("GERAR ARTE FINAL"):
                 with st.spinner("Gerando PNG..."):
-                    output_path = graphic_renderer.generate_infographic(df_view_mand, df_view_vis, rodada_selecionada, n_jogos, tipo_filtro)
-                    if output_path:
-                        st.success("Arte gerada!")
-                        st.image(output_path, width='stretch')
-                        with open(output_path, "rb") as file:
-                            st.download_button("⬇️ BAIXAR PNG", file, f"Analise_R{rodada_selecionada}.png", "image/png")
+                    try:
+                        # DEBUG: Mostrar tipos e formas antes da chamada
+                        print(f"DEBUG: df_view_mand shape: {df_view_mand.shape}")
+                        print(f"DEBUG: df_view_vis shape: {df_view_vis.shape}")
+                        
+                        output_path = graphic_renderer.generate_infographic(df_view_mand, df_view_vis, rodada_selecionada, n_jogos, tipo_filtro)
+                        
+                        if output_path:
+                            st.success("Arte gerada!")
+                            st.image(output_path, width='stretch')
+                            with open(output_path, "rb") as file:
+                                st.download_button("⬇️ BAIXAR PNG", file, f"Analise_R{rodada_selecionada}.png", "image/png")
+                    except NameError as e:
+                        st.error(f"❌ ERRO DE NOME (NameError): {e}")
+                        st.info("Verifique se todas as variáveis estão definidas. Veja os logs para detalhes.")
+                        print(f"ERROR: NameError in app.py: {e}")
+                    except Exception as e:
+                        st.error(f"❌ Erro ao gerar arte final: {type(e).__name__} - {e}")
+                        import traceback
+                        st.code(traceback.format_exc())
 else:
     st.info("Aguardando upload do CSV...")

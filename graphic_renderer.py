@@ -5,16 +5,21 @@ from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import matplotlib.colors as mcolors
 import pandas as pd
 import os
-import unicodedata
-
-from pathlib import Path
-
 import io
 import base64
+import unicodedata
+from pathlib import Path
 from PIL import Image
+import numpy as np
+
 try:
     from image_data import IMAGES
+    print(f"[INIT] Banco de imagens IMAGES carregado com {len(IMAGES)} chaves.")
 except ImportError:
+    print("[INIT] AVISO: image_data.py não encontrado. Usando banco vazio.")
+    IMAGES = {}
+except Exception as e:
+    print(f"[INIT] ERRO ao carregar image_data.py: {e}")
     IMAGES = {}
 
 def get_image_from_base64(key):
