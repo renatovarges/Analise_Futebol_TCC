@@ -32,14 +32,10 @@ BASE_DIR = Path(__file__).resolve().parent
 
 # --- CARREGAR FONTE ---
 try:
-    font_files = [f for f in os.listdir(FONTS_DIR) if f.lower().endswith(('.ttf', '.otf'))]
-    if font_files:
-        font_path = FONTS_DIR / font_files[0]
-        prop = fm.FontProperties(fname=font_path)
-    else:
-        prop = fm.FontProperties(family='sans-serif', weight='bold')
+    # Tentativa de carregar fonte local se existir, senão usa padrão
+    prop = fm.FontProperties(family='sans-serif', weight='bold')
 except Exception:
-    prop = fm.FontProperties(family='sans-serif', weight='normal') # Usando normal para evitar o "muito negrito"
+    prop = fm.FontProperties(family='sans-serif', weight='normal')
 
 # --- CONFIGURAÇÕES DE ESTILO ---
 COLOR_BG = "#F5F5F5"
@@ -70,17 +66,18 @@ def get_conditional_color(value, column_values, higher_is_better=True):
         return "#FFFFFF"
 
 def sanitize_name(name):
-    """Remove acentos e espaços para compatibilidade com arquivos."""
+    """UNIFICADO: Remove acentos e espaços para compatibilidade com arquivos."""
     if not name: return ""
     import unicodedata
     n = unicodedata.normalize('NFKD', str(name)).encode('ASCII', 'ignore').decode('ASCII')
-    return n.lower().replace(" ", "_").replace("-", "_")
+    # Lowercase, troca espaços e hífens por underscore, remove duplos
+    return n.lower().replace(" ", "_").replace("-", "_").strip("_")
 
 def get_team_logo_path(team_name):
     """Busca o escudo do time no banco de dados Base64."""
     if not team_name: return None
     
-    # Mapa de nomes curtos para chaves do banco de dados
+    # Mapa de nomes curtos para chaves do banco de dados (Apenas underscore agora)
     MAPA_SIMPLIFICADO = {
         "atletico_m": "atletico_mg", "atletico": "atletico_mg", 
         "botafogo": "botafogo", "chapeco": "chapecoense",
@@ -89,7 +86,7 @@ def get_team_logo_path(team_name):
         "flamengo": "flamengo", "fluminense": "fluminense", "sao_paulo": "sao_paulo",
         "santos": "santos", "cruzeiro": "cruzeiro", "bahia": "bahia", "inter": "internacional",
         "corinth": "corinthians", "coritiba": "coritiba", "mirassol": "mirassol",
-        "remo": "remo", "athletico": "athletico-pr"
+        "remo": "remo", "athletico": "athletico_pr"
     }
     
     sanitized = sanitize_name(team_name)
@@ -100,7 +97,10 @@ def get_team_logo_path(team_name):
     target = f"team_{sanitized}"
     if target in IMAGES: return target
     
-    print(f"[LOG] Escudo não encontrado no DB para: {team_name}")
+    # Tenta tbm sem o prefixo team_ se o sanitized já for o alvo
+    if sanitized in IMAGES: return sanitized
+    
+    print(f"[LOG] Escudo não encontrado no DB para: '{team_name}' (Tentativa: {target})")
     return None
 
 def add_image(ax, key_or_img, x, y, zoom=0.1, zorder=10):
@@ -108,6 +108,9 @@ def add_image(ax, key_or_img, x, y, zoom=0.1, zorder=10):
     img = None
     if isinstance(key_or_img, str):
         img = get_image_from_base64(key_or_img)
+        if img is None:
+            print(f"[LOG] Falha total ao carregar chave: {key_or_img}")
+            return
     else:
         img = key_or_img # Já é um objeto de imagem
         
@@ -117,7 +120,7 @@ def add_image(ax, key_or_img, x, y, zoom=0.1, zorder=10):
         ab = AnnotationBbox(OffsetImage(img, zoom=zoom), (x, y), frameon=False, xycoords='axes fraction', zorder=zorder)
         ax.add_artist(ab)
     except Exception as e:
-        print(f"[LOG] Erro ao renderizar imagem {key_or_img}: {e}")
+        print(f"[LOG] Erro ao renderizar objeto de imagem {key_or_img}: {e}")
 
 def generate_infographic(df_mandante, df_visitante, rodada_num, n_jogos, tipo_filtro):
     m_col = 'XG casa' if 'XG casa' in df_mandante.columns else 'xG casa'
@@ -128,13 +131,6 @@ def generate_infographic(df_mandante, df_visitante, rodada_num, n_jogos, tipo_fi
     
     # Aumentei a altura para 20 e DPI para 400 para nitidez máxima
     fig, ax = plt.subplots(figsize=(12, 19))
-    bg_path = os.path.join(LOGOS_DIR, "background.png")
-    if os.path.exists(bg_path):
-        ax.imshow(mpimg.imread(bg_path), extent=[0, 1, 0, 1], aspect='auto', zorder=-1)
-    else:
-        fig.patch.set_facecolor(COLOR_BG)
-    ax.set_axis_off()
-
     # Fundo (Background) via Base64
     bg_img = get_image_from_base64("logo_background")
     if bg_img:
@@ -145,6 +141,7 @@ def generate_infographic(df_mandante, df_visitante, rodada_num, n_jogos, tipo_fi
             fig.patch.set_facecolor(COLOR_BG)
     else:
         fig.patch.set_facecolor(COLOR_BG)
+    ax.set_axis_off()
 
     header_y = 0.94
     ax.add_patch(plt.Rectangle((0.2, header_y - 0.02), 0.6, 0.04, color=COLOR_HEADER_BG, transform=ax.transAxes))

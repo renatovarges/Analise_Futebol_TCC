@@ -10,27 +10,21 @@ from pathlib import Path
 import streamlit as st
 
 def deploy_check():
-    print(f"=== INICIANDO CONFERÊNCIA DE ARQUIVOS (SERVIDOR) ===")
-    cwd = Path.cwd()
-    base = Path(__file__).resolve().parent
-    print(f"Diretório Atual: {cwd}")
-    print(f"Diretório do App: {base}")
-    
-    # Caminho esperado dos assets
-    assets_path = base / "assets"
-    if assets_path.exists():
-        print(f"PASTA ASSETS ENCONTRADA: {assets_path}")
-        # Listar subpastas cruciais
-        for sub in ["logos", "teams"]:
-            p = assets_path / sub
-            if p.exists():
-                files = list(p.glob("*.png"))
-                print(f"  -> {sub}: {len(files)} arquivos encontrados.")
-            else:
-                print(f"  -> ERRO: Pasta '{sub}' NÃO encontrada em {p}!")
-    else:
-        print(f"ERRO CRÍTICO: Pasta 'assets' NÃO encontrada em {assets_path}!")
-        print(f"Arquivos na raiz: {list(base.glob('*'))}")
+    print(f"=== CONFERÊNCIA DE ASSETS (BASE64) ===")
+    try:
+        from image_data import IMAGES
+        count = len(IMAGES)
+        print(f"SUCESSO: Banco de imagens carregado com {count} chaves.")
+        if count == 0:
+            print("AVISO: O banco de imagens IMAGES está VAZIO!")
+        else:
+            # Lista as primeiras 5 chaves para confirmar o padrão
+            sample = list(IMAGES.keys())[:5]
+            print(f"Amostra de chaves: {sample}")
+    except ImportError:
+        print("ERRO CRÍTICO: Arquivo 'image_data.py' não encontrado no servidor!")
+    except Exception as e:
+        print(f"ERRO AO CARREGAR IMAGENS: {e}")
 
 deploy_check()
 # --- FIM DEBUG ---

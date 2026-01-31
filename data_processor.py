@@ -73,6 +73,10 @@ def load_and_clean_data(filepath):
         df = df.dropna(subset=['Mandante', 'Visitante'])
         df = df[~df['Mandante'].astype(str).str.contains('Time|Casa|Mandante', na=False)].reset_index(drop=True)
         
+        # Strip nos nomes dos times para evitar erros de match (ex: "São Paulo ")
+        df['Mandante'] = df['Mandante'].astype(str).str.strip()
+        df['Visitante'] = df['Visitante'].astype(str).str.strip()
+        
         # 2. Converter Data
         df['Data'] = pd.to_datetime(df['Data'], errors='coerce')
         # Remove apenas se nem a Rodada nem a Data existirem (garante que não pegamos o lixo do rodapé)
