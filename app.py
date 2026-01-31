@@ -29,6 +29,34 @@ def deploy_check():
 deploy_check()
 # --- FIM DEBUG ---
 
+# --- SISTEMA DE AUTENTICAÇÃO (PIN) ---
+def check_password():
+    """Retorna True se o usuário digitou o PIN correto."""
+    def password_entered():
+        if st.session_state["pin"] == st.secrets.get("ACCESS_PIN", "1234"):
+            st.session_state["authenticated"] = True
+            del st.session_state["pin"] # Limpa o PIN da memória
+        else:
+            st.session_state["authenticated"] = False
+
+    if "authenticated" not in st.session_state:
+        st.session_state["authenticated"] = False
+
+    if not st.session_state["authenticated"]:
+        # Tela de Login
+        st.markdown("<h1 style='text-align: center;'>🔒 Acesso Restrito</h1>", unsafe_allow_html=True)
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col2:
+            st.text_input("Digite o PIN de 4 dígitos", type="password", on_change=password_entered, key="pin")
+            if "authenticated" in st.session_state and not st.session_state["authenticated"]:
+                 if "pin" not in st.session_state: # Se o PIN foi deletado mas a auth falhou antes
+                    st.error("❌ PIN incorreto! Tente novamente.")
+        return False
+    return True
+
+if not check_password():
+    st.stop() # Interrompe a execução do app se não estiver autenticado
+
 # Configuração da Página - Modo Wide para caber as tabelas
 st.set_page_config(page_title="Análise xG/xGA Brasileirão", layout="wide")
 
