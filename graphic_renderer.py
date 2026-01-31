@@ -160,8 +160,8 @@ def generate_infographic(df_mandante, df_visitante, rodada_num, n_jogos, tipo_fi
     ax.set_axis_off()
 
     header_y = 0.94
-    # Aumentado largura para 0.7 e altura para 0.055 para acomodar a Decalotype
-    ax.add_patch(plt.Rectangle((0.15, header_y - 0.027), 0.7, 0.055, color=COLOR_HEADER_BG, transform=ax.transAxes))
+    # Ajustado largura para 0.6 e mantido altura para Decalotype
+    ax.add_patch(plt.Rectangle((0.2, header_y - 0.027), 0.6, 0.055, color=COLOR_HEADER_BG, transform=ax.transAxes))
     ax.text(0.5, header_y, f"ANÁLISE XG E XGA – RODADA {rodada_num}", ha="center", va="center", color="white", fontproperties=prop, fontsize=24, transform=ax.transAxes)
 
     # Logos do Cabeçalho - Usando DB Base64
