@@ -33,29 +33,35 @@ deploy_check()
 def check_password():
     """Retorna True se o usuário digitou o PIN correto."""
     def password_entered():
-        if st.session_state["pin"] == st.secrets.get("ACCESS_PIN", "1234"):
+        correct_pin = str(st.secrets.get("ACCESS_PIN", "1234"))
+        if st.session_state["pin_input"] == correct_pin:
             st.session_state["authenticated"] = True
-            del st.session_state["pin"] # Limpa o PIN da memória
+            st.session_state["auth_error"] = False
         else:
             st.session_state["authenticated"] = False
+            st.session_state["auth_error"] = True
 
     if "authenticated" not in st.session_state:
         st.session_state["authenticated"] = False
+    if "auth_error" not in st.session_state:
+        st.session_state["auth_error"] = False
 
     if not st.session_state["authenticated"]:
-        # Tela de Login
+        # Tela de Login centralizada
+        st.markdown("<br><br><br>", unsafe_allow_html=True)
         st.markdown("<h1 style='text-align: center;'>🔒 Acesso Restrito</h1>", unsafe_allow_html=True)
-        col1, col2, col3 = st.columns([1, 1, 1])
+        st.markdown("<p style='text-align: center; color: #666;'>Insira o código de 4 dígitos para acessar a ferramenta.</p>", unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns([1, 1.2, 1])
         with col2:
-            st.text_input("Digite o PIN de 4 dígitos", type="password", on_change=password_entered, key="pin")
-            if "authenticated" in st.session_state and not st.session_state["authenticated"]:
-                 if "pin" not in st.session_state: # Se o PIN foi deletado mas a auth falhou antes
-                    st.error("❌ PIN incorreto! Tente novamente.")
+            st.text_input("PIN", type="password", on_change=password_entered, key="pin_input", label_visibility="collapsed")
+            if st.session_state["auth_error"]:
+                st.error("❌ PIN incorreto! Tente novamente.")
         return False
     return True
 
 if not check_password():
-    st.stop() # Interrompe a execução do app se não estiver autenticado
+    st.stop()
 
 # Configuração da Página - Modo Wide para caber as tabelas
 st.set_page_config(page_title="Análise xG/xGA Brasileirão", layout="wide")
