@@ -36,10 +36,16 @@ def get_image_from_base64(key):
 BASE_DIR = Path(__file__).resolve().parent
 
 # --- CARREGAR FONTE ---
+font_path = BASE_DIR / "assets" / "fonts" / "Decalotype-Bold.otf"
 try:
-    # Tentativa de carregar fonte local se existir, senão usa padrão
-    prop = fm.FontProperties(family='sans-serif', weight='bold')
-except Exception:
+    if font_path.exists():
+        fm.fontManager.addfont(str(font_path))
+        prop = fm.FontProperties(fname=str(font_path))
+    else:
+        # Tenta fallback para sans-serif se arquivo não existir
+        prop = fm.FontProperties(family='sans-serif', weight='bold')
+except Exception as e:
+    print(f"[INIT] Erro ao carregar fonte {font_path}: {e}")
     prop = fm.FontProperties(family='sans-serif', weight='normal')
 
 # --- CONFIGURAÇÕES DE ESTILO ---
@@ -122,7 +128,12 @@ def add_image(ax, key_or_img, x, y, zoom=0.1, zorder=10):
     if img is None: return
     
     try:
-        ab = AnnotationBbox(OffsetImage(img, zoom=zoom), (x, y), frameon=False, xycoords='axes fraction', zorder=zorder)
+        # Se for objeto PIL, converte para array para máxima qualidade no Matplotlib
+        if not isinstance(img, np.ndarray):
+            img = np.array(img.convert('RGBA'))
+            
+        # Adicionado resample=True para suavizar escala
+        ab = AnnotationBbox(OffsetImage(img, zoom=zoom, resample=True), (x, y), frameon=False, xycoords='axes fraction', zorder=zorder)
         ax.add_artist(ab)
     except Exception as e:
         print(f"[LOG] Erro ao renderizar objeto de imagem {key_or_img}: {e}")
@@ -149,7 +160,8 @@ def generate_infographic(df_mandante, df_visitante, rodada_num, n_jogos, tipo_fi
     ax.set_axis_off()
 
     header_y = 0.94
-    ax.add_patch(plt.Rectangle((0.2, header_y - 0.02), 0.6, 0.04, color=COLOR_HEADER_BG, transform=ax.transAxes))
+    # Aumentado largura para 0.7 e altura para 0.055 para acomodar a Decalotype
+    ax.add_patch(plt.Rectangle((0.15, header_y - 0.027), 0.7, 0.055, color=COLOR_HEADER_BG, transform=ax.transAxes))
     ax.text(0.5, header_y, f"ANÁLISE XG E XGA – RODADA {rodada_num}", ha="center", va="center", color="white", fontproperties=prop, fontsize=24, transform=ax.transAxes)
 
     # Logos do Cabeçalho - Usando DB Base64

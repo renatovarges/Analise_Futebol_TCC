@@ -18,6 +18,8 @@ venv/
 !assets/logos/logo_tcc.png
 !assets/logos/logo_tcc_branco.png
 !assets/teams/*.png
+!assets/fonts/*.otf
+!assets/fonts/*.ttf
 
 # Meus arquivos de debug/teste
 surgical_inspect*.py
