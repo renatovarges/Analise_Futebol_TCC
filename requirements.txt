@@ -1,0 +1,13 @@
+streamlit>=1.40.0
+pandas<2.2.0
+numpy<2.0.0
+openpyxl
+matplotlib
+Pillow
+psutil
+requests
+
+# Redação dos destaques — opcionais.
+# Sem nenhuma das duas, a plataforma usa a engine Python local.
+openai
+anthropic
