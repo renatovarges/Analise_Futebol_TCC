@@ -335,6 +335,13 @@ def coletar_temporada(forcar: bool = False, progresso=None,
             antigos = {}
 
     eventos = _eventos_da_temporada(sid)
+
+    # SofaScore/Cloudflare às vezes bloqueia o IP de quem chama (comum em
+    # servidores de nuvem, como o Streamlit Cloud). Sem isso, uma falha de
+    # rede zerava a temporada inteira, sobrescrevendo o cache bom com vazio.
+    if not eventos and antigos:
+        return list(antigos.values())
+
     jogos, baixados = [], 0
     pendentes = [e for e in eventos
                  if e.get("status", {}).get("type") == "finished"
