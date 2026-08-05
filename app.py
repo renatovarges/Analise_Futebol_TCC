@@ -13,7 +13,7 @@ try:
     import graphic_renderer
     import analytics_engine
     import narrative_engine
-    from footystats_api import fetch_all_matches
+    from sofascore_api import fetch_all_matches
 
     # ── ESTILO ────────────────────────────────────────────────────────────
     st.markdown("""
@@ -188,7 +188,7 @@ try:
     filtro_label = "por mando" if tipo_filtro == "POR_MANDO" else "gerais"
     st.caption(
         f"Usando os **{n_jogos} últimos jogos {filtro_label}** de cada time  "
-        f"·  Dados: FootyStats API (Brasileirão 2026)"
+        f"·  Dados: SofaScore (Brasileirão 2026)"
     )
 
     # ── CONFRONTOS DA RODADA ──────────────────────────────────────────────

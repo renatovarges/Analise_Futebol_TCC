@@ -6,6 +6,7 @@ matplotlib
 Pillow
 psutil
 requests
+soccerdata==1.9.0
 
 # Redação dos destaques — opcionais.
 # Sem nenhuma das duas, a plataforma usa a engine Python local.
