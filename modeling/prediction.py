@@ -74,6 +74,22 @@ def _p_sg(mu_sofridos: float) -> float:
     return max(0.0, min(1.0, math.exp(-mu_sofridos)))
 
 
+def _faixa_expectativa(p: float, faixas: dict) -> str:
+    """
+    Rótulo derivado da DISTRIBUIÇÃO OBSERVADA das probabilidades do modelo no
+    treino (artifacts/model_metadata.json → faixas_probabilidade), não de
+    corte arbitrário. p abaixo do p50 histórico = "baixa", até o p75 =
+    "moderada", até o p90 = "alta", acima = "muito alta".
+    """
+    if p < faixas["p50"]:
+        return "expectativa baixa"
+    if p < faixas["p75"]:
+        return "expectativa moderada"
+    if p < faixas["p90"]:
+        return "expectativa alta"
+    return "expectativa muito alta"
+
+
 def _confianca(linha: dict) -> float:
     """
     Confiança separada da probabilidade (seção 16): função de cobertura de
@@ -108,13 +124,17 @@ def prever_confronto(mandante: str, visitante: str, rodada_num: int, date_unix: 
         mu_ataque = _mu_poisson(meta["modelo_ataque_gols_marcados"], linha)
         mu_defesa = _mu_poisson(meta["modelo_defesa_gols_sofridos"], linha)
 
+        p_ataque = _p_2mais_gols(mu_ataque)
+        p_defesa = _p_sg(mu_defesa)
         saida[time] = {
             "equipe": time, "adversario": adversario,
             "mando": linha["mando"],
             "gols_esperados": round(mu_ataque, 2),
             "gols_esperados_sofridos": round(mu_defesa, 2),
-            "probabilidade_2_mais_gols": round(_p_2mais_gols(mu_ataque), 3),
-            "probabilidade_sg": round(_p_sg(mu_defesa), 3),
+            "probabilidade_2_mais_gols": round(p_ataque, 3),
+            "probabilidade_sg": round(p_defesa, 3),
+            "faixa_ataque": _faixa_expectativa(p_ataque, meta["modelo_ataque_gols_marcados"]["faixas_probabilidade"]),
+            "faixa_defesa": _faixa_expectativa(p_defesa, meta["modelo_defesa_gols_sofridos"]["faixas_probabilidade"]),
             "confianca": _confianca(linha),
             "amostra_disponivel": linha["amostra_geral"],
             "amostra_mesmo_mando": linha["amostra_mesmo_mando"],

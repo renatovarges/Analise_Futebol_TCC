@@ -583,38 +583,52 @@ def _marcar_faixas(lista: list[dict]) -> None:
 # ENTRADA PRINCIPAL
 # ---------------------------------------------------------------------------
 
-# Confiabilidade medida FORA DA AMOSTRA em 4 temporadas do Brasileirão
-# (2023 a 2026), 79 rodadas, 1.610 observações por eixo. Em cada rodada o
-# motor rodou usando só dados anteriores a ela.
+# Confiabilidade do MODELO POISSON, medida por backtest walk-forward real em
+# 4 temporadas (2023-2026), 126 rodadas, 2530 observações equipe-partida —
+# ver artifacts/evaluation_summary.json e artifacts/validacao_poisson.json,
+# reproduzíveis via scripts/run_backtest.py e scripts/validar_poisson.py.
 #
-# Uma validação anterior, feita só com 2026 (192 observações), indicava defesa
-# forte e ataque irrelevante. Era artefato de amostra: 2026 é atípica nos dois
-# eixos. Com as 4 temporadas, os dois eixos são significativos e o ofensivo
-# separa um pouco mais. Os números abaixo são os de 4 temporadas.
+# Honestidade obrigatória (revisão de 2026-08-06): a vantagem de calibração
+# média do Poisson sobre uma baseline simples (taxa da liga por mando) é
+# PEQUENA e NÃO passou no teste de significância a 95% — o intervalo de
+# confiança da diferença de Brier Score inclui zero nos dois alvos. O que É
+# real e mensurável é a capacidade de RANQUEAR: entre os 3/5/6 times mais
+# bem colocados pelo modelo numa rodada, a taxa de acerto fica
+# consistentemente acima da média da própria rodada.
 CONFIABILIDADE = {
     "defensivo": {
         "nivel": "moderada",
-        "texto": "Validado em 4 temporadas (1.610 casos): os destaques conquistaram "
-                 "SG cerca de 9 pontos percentuais mais que o resto. O sinal vem "
-                 "sobretudo da solidez própria do time — o ataque adversário estar "
-                 "fraco ajuda pouco. Diferença real, mas modesta: melhora a chance "
-                 "de SG, não a garante.",
+        "texto": "Backtest walk-forward, 126 rodadas (2023-2026): entre os 3 times "
+                 "mais bem colocados no ranking defensivo de cada rodada, a taxa de "
+                 "SG fica cerca de 11 pontos percentuais acima da média da própria "
+                 "rodada (top 5: +10pp; top 6: +10pp). A vantagem de calibração média "
+                 "sobre a taxa-base da liga é pequena e não é estatisticamente "
+                 "significativa a 95% — o modelo ajuda a ordenar quem tem cenário "
+                 "mais favorável, não garante SG.",
     },
     "ofensivo": {
         "nivel": "moderada",
-        "texto": "Validado em 4 temporadas (1.610 casos): os destaques marcaram 2 "
-                 "ou mais gols cerca de 12 pontos percentuais mais que o resto. "
-                 "Aqui o cruzamento com a fragilidade do adversário é o que mais "
-                 "contribui — força ofensiva isolada quase não discrimina. O alvo "
-                 "é volume de gol, não marcar ao menos uma vez (isso acontece em "
-                 "76% dos jogos e separa pouco).",
+        "texto": "Backtest walk-forward, 126 rodadas (2023-2026): entre os 3 times "
+                 "mais bem colocados no ranking ofensivo de cada rodada, a taxa de "
+                 "2 ou mais gols fica cerca de 13 pontos percentuais acima da média "
+                 "da própria rodada (top 5: +11pp; top 6: +10pp). A capacidade de "
+                 "discriminação é limitada (AUC≈0,60) e a vantagem de calibração "
+                 "média sobre a taxa-base da liga não é estatisticamente "
+                 "significativa a 95% — o alvo é volume de gol, não marcar ao menos "
+                 "uma vez.",
     },
 }
 
 
-def analisar_rodada(confrontos: list[dict], rodada_num: int, n_jogos: int,
-                    tipo_filtro: str, top_n: int = 6) -> dict:
-    """Roda o motor completo para uma rodada."""
+def analisar_rodada_legado(confrontos: list[dict], rodada_num: int, n_jogos: int,
+                           tipo_filtro: str, top_n: int = 6) -> dict:
+    """
+    Motor ORIGINAL (z-score + potencialização por sinal). Mantido só como
+    baseline de auditoria (seção 9 da revisão de 2026-08-06) — comparação em
+    modo espelho contra o modelo Poisson em scripts/comparar_motores.py. NÃO
+    é chamado pela produção: app.py usa analisar_rodada(), que deriva o
+    ranking do modelo preditivo validado por backtest.
+    """
     top_n = max(5, min(7, top_n))
     todos = fetch_all_matches()
     base = _baseline(rodada_num, todos)
@@ -658,4 +672,176 @@ def analisar_rodada(confrontos: list[dict], rodada_num: int, n_jogos: int,
         "ranking_defensivo": todos_def[:top_n],
         "todos_ofensivos": todos_of, "todos_defensivos": todos_def,
         "confiabilidade": CONFIABILIDADE,
+    }
+
+
+# ---------------------------------------------------------------------------
+# MOTOR DE PRODUÇÃO — ranking pelo modelo Poisson validado (seção 8/9)
+# ---------------------------------------------------------------------------
+# Substitui a normalização feita só entre os ~10 mandantes/visitantes da
+# própria rodada (instável: um valor extremo de UM time mudava o z-score de
+# TODOS os outros) e a interação descontínua "produto dos z-scores se mesmo
+# sinal, zero se sinal oposto" por probabilidades calibradas por backtest
+# walk-forward em 4 temporadas (modeling/, ver artifacts/evaluation_summary.json
+# e artifacts/validacao_poisson.json). A vantagem de Brier Score sobre uma
+# baseline por liga+mando é MODESTA e não passou no teste de significância a
+# 95% — não é "muito mais preciso"; é estruturalmente mais correto (deriva
+# P(2+gols) e P(SG) de uma única distribuição, sem misturar índices
+# heurísticos) e mais estável (Spearman ~0,91 sob reamostragem do treino).
+
+ROTULOS_FEATURE_MODELO = {
+    "xg": "xG produzido", "sot": "chutes no alvo", "chutes_area": "finalizações na área",
+    "toques_area": "toques na área", "grandes_chances": "grandes chances criadas",
+    "xg_ced": "xG cedido", "sot_ced": "chutes no alvo cedidos",
+    "chutes_area_ced": "finalizações cedidas na área", "grandes_chances_ced": "grandes chances cedidas",
+}
+
+
+def _rotulo_feature(campo: str) -> str:
+    base = campo.replace("adv_", "").rsplit("_j", 1)[0].rsplit("_temporada", 1)[0].rsplit("_ewma", 1)[0]
+    lado = "do adversário" if campo.startswith("adv_") else "próprio"
+    return f"{ROTULOS_FEATURE_MODELO.get(base, base)} ({lado})"
+
+
+def _razoes_modelo(fatores: list[dict], eixo: str) -> list[str]:
+    """Razões da posição, faladas em português, a partir da contribuição real do modelo."""
+    razoes = []
+    for f in fatores[:2]:
+        direcao = "pesa a favor" if f["contribuicao"] > 0 else "pesa contra"
+        razoes.append(f"{_rotulo_feature(f['metrica'])} {direcao} da previsão (valor {f['valor']})")
+    return razoes
+
+
+def _classificar_por_probabilidade(p_propria: float, p_adv_eixo_oposto: float,
+                                   faixas_propria: dict, faixas_adv: dict) -> str:
+    """
+    Mesma semântica de veredito do motor antigo (seção 8/9 pedem preservar o
+    vocabulário da interface), agora derivada de faixas de percentil da
+    distribuição real do modelo (artifacts/model_metadata.json), não de
+    constantes arbitrárias como o LIMIAR_ADV_FORTE=0,90 do motor antigo.
+    """
+    adv_forte = p_adv_eixo_oposto >= faixas_adv["p75"]
+    adv_fraco = p_adv_eixo_oposto <= faixas_adv["p25"]
+    propria_alta = p_propria >= faixas_propria["p75"]
+    if adv_forte:
+        return "RESSALVA" if propria_alta else "ALTA_EXIGENCIA"
+    if adv_fraco:
+        return "MUITO_FAVORAVEL" if propria_alta else "FAVORAVEL"
+    return "FAVORAVEL" if propria_alta else "NEUTRO"
+
+
+def _dossie_modelo(p: Perfil, adv: Perfil, pred: dict, pred_adv: dict, faixas: dict,
+                   pos: int, eixo: str) -> dict:
+    if eixo == "ofensivo":
+        proprio, adv_fatos = _fatos_of(p), _fatos_def(adv)
+        sup, sup_adv = p.superlativos_of, adv.superlativos_def
+        prob, faixa_prob = pred["probabilidade_2_mais_gols"], pred["faixa_ataque"]
+        prob_adv_oposto = pred_adv["probabilidade_sg"]
+        faixas_propria, faixas_adv = faixas["ataque"], faixas["defesa"]
+        fatores = pred["fatores_ataque"]
+    else:
+        proprio, adv_fatos = _fatos_def(p), _fatos_of(adv)
+        sup, sup_adv = p.superlativos_def, adv.superlativos_of
+        prob, faixa_prob = pred["probabilidade_sg"], pred["faixa_defesa"]
+        prob_adv_oposto = pred_adv["probabilidade_2_mais_gols"]
+        faixas_propria, faixas_adv = faixas["defesa"], faixas["ataque"]
+        fatores = pred["fatores_defesa"]
+
+    veredito = _classificar_por_probabilidade(prob, prob_adv_oposto, faixas_propria, faixas_adv)
+    return {
+        "eixo": eixo, "posicao": pos, "time": p.nome, "adversario": adv.nome,
+        "mando": p.mando, "mando_adversario": adv.mando,
+        "indice": round(prob, 3),                          # agora é a probabilidade calibrada, não z-score
+        "probabilidade": round(prob, 3), "faixa_expectativa": faixa_prob,
+        "confianca_modelo": pred["confianca"],
+        "veredito": veredito, "veredito_texto": VEREDITOS[veredito],
+        "confianca": round(p.confianca, 2),                 # confiança por amostra (compat. narrativa)
+        "proprio": proprio, "adversario_fatos": adv_fatos,
+        "superlativos": sup, "superlativos_adversario": sup_adv,
+        "jogos_proprio": _rotulos(p), "jogos_adversario": _rotulos(adv),
+        "decomposicao": {f["metrica"]: f["contribuicao"] for f in fatores},
+        "razoes": _razoes_modelo(fatores, eixo),
+    }
+
+
+def analisar_rodada(confrontos: list[dict], rodada_num: int, n_jogos: int,
+                    tipo_filtro: str, top_n: int = 6) -> dict:
+    """
+    Motor de produção. O RANKING vem do modelo Poisson validado
+    (modeling/prediction.py); as tabelas de "últimos N jogos" e os
+    superlativos continuam calculados como antes — são conteúdo
+    DESCRITIVO, não a base do ranking (ver app.py para o aviso na
+    interface, seção 10 da revisão de 2026-08-06).
+    """
+    from modeling.prediction import carregar_metadata, prever_confronto
+
+    top_n = max(5, min(7, top_n))
+    todos = fetch_all_matches()
+    base = _baseline(rodada_num, todos)
+    meta = carregar_metadata()
+    faixas = {
+        "ataque": meta["modelo_ataque_gols_marcados"]["faixas_probabilidade"],
+        "defesa": meta["modelo_defesa_gols_sofridos"]["faixas_probabilidade"],
+    }
+
+    mandantes, visitantes = [], []
+    for c in confrontos:
+        for nome, papel, mando, lista, adv in (
+            (c["Mandante"], "home", "casa", mandantes, c["Visitante"]),
+            (c["Visitante"], "away", "fora", visitantes, c["Mandante"]),
+        ):
+            st, _ = _calcular_metricas(nome, rodada_num, n_jogos, tipo_filtro, papel)
+            serie = _historico(nome, rodada_num, mando, todos)
+            if not serie:
+                continue
+            p = Perfil(nome=nome, adversario=adv, mando=mando, serie=serie, stats=st)
+            p.medias = _perfil_metricas(serie)
+            p.residuo = _residuos(serie[-JANELA_LONGA:], mando, base)
+            lista.append(p)
+
+    # superlativos continuam por pool de mando — são fato descritivo
+    # ("maior xG entre os mandantes da rodada"), não entram no ranking.
+    _calcular_pool(mandantes, JANELA_LONGA)
+    _calcular_pool(visitantes, JANELA_LONGA)
+
+    dossies_of, dossies_def = [], []
+    for m in mandantes:
+        v = next((x for x in visitantes if x.nome == m.adversario), None)
+        if not v:
+            continue
+        jogo_raw = next(
+            (j for j in todos if j.get("game_week") == rodada_num
+             and j.get("home_name") == m.nome and j.get("away_name") == v.nome),
+            None,
+        )
+        if jogo_raw is None:
+            continue
+        pred = prever_confronto(m.nome, v.nome, rodada_num, jogo_raw["date_unix"], jogo_raw["id"], todos)
+        pred_m, pred_v = pred[m.nome], pred[v.nome]
+
+        dossies_of.append((m, v, pred_m, pred_v))   # ataque do mandante
+        dossies_of.append((v, m, pred_v, pred_m))   # ataque do visitante
+        dossies_def.append((m, v, pred_m, pred_v))  # defesa do mandante
+        dossies_def.append((v, m, pred_v, pred_m))  # defesa do visitante
+
+    ofs = sorted(dossies_of, key=lambda t: -t[2]["probabilidade_2_mais_gols"])
+    defs = sorted(dossies_def, key=lambda t: -t[2]["probabilidade_sg"])
+    todos_of = [_dossie_modelo(p, adv, pred, pred_adv, faixas, i + 1, "ofensivo")
+                for i, (p, adv, pred, pred_adv) in enumerate(ofs)]
+    todos_def = [_dossie_modelo(p, adv, pred, pred_adv, faixas, i + 1, "defensivo")
+                for i, (p, adv, pred, pred_adv) in enumerate(defs)]
+    _marcar_faixas(todos_of)
+    _marcar_faixas(todos_def)
+
+    return {
+        "rodada": rodada_num, "n_jogos": n_jogos, "tipo_filtro": tipo_filtro,
+        "janela_curta": JANELA_CURTA, "janela_longa": JANELA_LONGA,
+        "ranking_ofensivo": todos_of[:top_n],
+        "ranking_defensivo": todos_def[:top_n],
+        "todos_ofensivos": todos_of, "todos_defensivos": todos_def,
+        "confiabilidade": CONFIABILIDADE,
+        "modelo": {
+            "versao": meta["versao_modelo"], "treinado_em": meta["treinado_em"],
+            "hash_execucao": meta["hash_execucao"],
+        },
     }

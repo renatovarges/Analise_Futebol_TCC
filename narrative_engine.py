@@ -106,6 +106,13 @@ REGRAS INEGOCIÁVEIS
     depois; consistência da série antes das médias.
 12. Sem títulos, sem marcadores, sem emoji, sem aspas. Só o parágrafo corrido.
 
+13. Além do parágrafo, declare em "fatos_usados" QUAIS campos do dossiê você usou e de
+    QUE LADO cada um veio: "sujeito":"proprio" para números do dicionário "numeros_proprios"
+    do time analisado, "sujeito":"adversario" para números de "numeros_adversario". Declare
+    só os campos cujo VALOR realmente aparece escrito no parágrafo. Um validador automático
+    confere cada declaração contra o dossiê — declaração errada ou que não bate com o texto
+    derruba o parágrafo inteiro e ele é substituído por um parágrafo determinístico.
+
 VOCABULÁRIO DO DOSSIÊ
 - xg_medio / xga_medio: média por jogo no recorte
 - gols / gols_sofridos: total no recorte
@@ -124,8 +131,12 @@ rodada e não devem ser reaproveitados):
 """ + "\n\n".join(f"— {e}" for e in EXEMPLOS_REFERENCIA) + """
 
 SAÍDA
-Responda em JSON: {"paragrafos": [{"chave": "<chave do dossiê>", "texto": "<parágrafo>"}]}
-Um item por time do dossiê, na mesma ordem."""
+Responda em JSON:
+{"paragrafos": [{"chave": "<chave do dossiê>", "texto": "<parágrafo>",
+                 "fatos_usados": [{"campo": "<chave em numeros_proprios ou numeros_adversario>",
+                                    "sujeito": "proprio ou adversario"}]}]}
+Um item por time do dossiê, na mesma ordem. "fatos_usados" precisa ter pelo menos um
+item "proprio" e um "adversario" — é a prova de que o parágrafo cruzou os dois lados."""
 
 
 # ---------------------------------------------------------------------------
@@ -174,18 +185,26 @@ _NUM_RE = re.compile(r"\d+(?:[.,]\d+)?")
 
 
 def _formas_aceitas(valor) -> set[str]:
-    """Todas as grafias plausíveis de um valor numérico do dossiê."""
+    """
+    Todas as grafias plausíveis de um valor numérico do dossiê.
+
+    Inclui o valor absoluto: "gols_evitados_goleiro" negativo vira, na
+    prosa, "0,51 gol por jogo ABAIXO do esperado" — o sinal já está na
+    palavra "abaixo", repetir o "-" seria estranho. Sem isso, todo número
+    negativo do dossiê disparava alerta de "sem origem" por engano.
+    """
     formas = set()
     try:
         v = float(valor)
     except (TypeError, ValueError):
         return formas
-    if v == int(v):
-        formas.add(str(int(v)))
-    for casas in (0, 1, 2):
-        s = f"{v:.{casas}f}"
-        formas.add(s)
-        formas.add(s.replace(".", ","))
+    for candidato in (v, abs(v)):
+        if candidato == int(candidato):
+            formas.add(str(int(candidato)))
+        for casas in (0, 1, 2):
+            s = f"{candidato:.{casas}f}"
+            formas.add(s)
+            formas.add(s.replace(".", ","))
     return formas
 
 
@@ -522,8 +541,20 @@ _SCHEMA = {
                 "properties": {
                     "chave": {"type": "string"},
                     "texto": {"type": "string"},
+                    "fatos_usados": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "campo": {"type": "string"},
+                                "sujeito": {"type": "string", "enum": ["proprio", "adversario"]},
+                            },
+                            "required": ["campo", "sujeito"],
+                            "additionalProperties": False,
+                        },
+                    },
                 },
-                "required": ["chave", "texto"],
+                "required": ["chave", "texto", "fatos_usados"],
                 "additionalProperties": False,
             },
         }
@@ -550,14 +581,16 @@ def _prompt_usuario(payload: list[dict], analise: dict) -> str:
     )
 
 
-def _parse(bruto: str) -> dict[str, str]:
+def _parse(bruto: str) -> tuple[dict[str, str], dict[str, list[dict]]]:
     """Extrai o JSON da resposta, tolerando cercas de código."""
     txt = bruto.strip()
     if txt.startswith("```"):
         txt = re.sub(r"^```(?:json)?\s*", "", txt)
         txt = re.sub(r"\s*```$", "", txt)
     dados = json.loads(txt)
-    return {p["chave"]: p["texto"].strip() for p in dados["paragrafos"]}
+    textos = {p["chave"]: p["texto"].strip() for p in dados["paragrafos"]}
+    fatos = {p["chave"]: p.get("fatos_usados", []) for p in dados["paragrafos"]}
+    return textos, fatos
 
 
 def _e_incompativel_com_chat(e: Exception) -> bool:
@@ -586,7 +619,7 @@ def _texto_da_resposta(r) -> str:
     return "".join(partes)
 
 
-def _redigir_openai(payload, analise, api_key, modelo, timeout: float) -> dict[str, str]:
+def _redigir_openai(payload, analise, api_key, modelo, timeout: float) -> tuple[dict[str, str], dict[str, list]]:
     from openai import OpenAI
 
     # max_retries=0 é essencial: o padrão do SDK é 2, então uma requisição
@@ -623,7 +656,7 @@ def _redigir_openai(payload, analise, api_key, modelo, timeout: float) -> dict[s
     return _parse(_texto_da_resposta(r))
 
 
-def _redigir_claude(payload, analise, api_key, modelo, timeout: float) -> dict[str, str]:
+def _redigir_claude(payload, analise, api_key, modelo, timeout: float) -> tuple[dict[str, str], dict[str, list]]:
     import anthropic
 
     client = anthropic.Anthropic(api_key=api_key, timeout=timeout, max_retries=0)
@@ -708,31 +741,64 @@ def gerar_paragrafos(
     """
     Redige os parágrafos dos destaques da rodada.
 
+    Cada parágrafo de IA é validado individualmente (atribuição completa,
+    tom vs veredito, frases banidas — narratives/phrase_validator.py) e,
+    fora do padrão, substituído SÓ NAQUELE ITEM pelo motor Python — não
+    descarta a rodada inteira por causa de um parágrafo problemático.
+    Depois disso, um controle de repetição (narratives/repetition_control.py)
+    passa pela rodada inteira na ordem do ranking e tenta re-substituir por
+    Python qualquer parágrafo de IA estruturalmente repetido.
+
     Retorna:
         {
           "textos":     {chave: parágrafo},
-          "alertas":    {chave: [números sem origem no dossiê]},
+          "alertas":    {chave: [números sem origem no dossiê]},        # checagem antiga, mantida
+          "problemas_ia": {chave: [motivos da substituição, se houve]},  # novo
+          "repeticoes":  {chave: [avisos de repetição não resolvidos]},  # novo
+          "fontes":      {chave: "ia" | "python (fallback item)" | "python"},
           "provedor_usado": str,
-          "segundos":   float,        # quanto durou a geração
-          "erro":       str | None,   # preenchido quando houve queda para o fallback
+          "segundos":   float,
+          "erro":       str | None,
         }
     """
     import time
+
+    from narratives.phrase_validator import validar_paragrafo_ia, validar_paragrafo_fallback
+    from narratives.repetition_control import ControleRepeticao
 
     dossies = analise["ranking_ofensivo"] + analise["ranking_defensivo"]
     payload = montar_payload(analise)
     erro = None
     usado = provedor
     t0 = time.monotonic()
+    problemas_ia: dict[str, list[str]] = {}
+    fontes: dict[str, str] = {}
 
     if provedor in ("openai", "claude") and api_key:
         fn = _redigir_openai if provedor == "openai" else _redigir_claude
         alvo = modelo or MODELOS_PADRAO[provedor]
         try:
-            textos = fn(payload, analise, api_key, alvo, timeout)
+            textos, fatos = fn(payload, analise, api_key, alvo, timeout)
             faltando = [chave_dossie(d) for d in dossies if not textos.get(chave_dossie(d))]
             if faltando:
                 raise ValueError(f"resposta incompleta: {len(faltando)} parágrafo(s)")
+
+            precisam_fallback = []
+            for d in dossies:
+                k = chave_dossie(d)
+                probs = validar_paragrafo_ia(textos[k], fatos.get(k, []), d)
+                if probs:
+                    problemas_ia[k] = probs
+                    precisam_fallback.append(d)
+                else:
+                    fontes[k] = "ia"
+
+            if precisam_fallback:
+                substitutos = _redigir_python(precisam_fallback)
+                for d in precisam_fallback:
+                    k = chave_dossie(d)
+                    textos[k] = substitutos[k]
+                    fontes[k] = "python (fallback item)"
         except Exception as e:
             gasto = time.monotonic() - t0
             if "timeout" in type(e).__name__.lower() or "timed out" in str(e).lower():
@@ -743,17 +809,49 @@ def gerar_paragrafos(
                 erro = f"[modelo: {alvo}] {type(e).__name__}: {e}"
             textos = _redigir_python(dossies)
             usado = "python (fallback)"
+            fontes = {chave_dossie(d): "python (fallback)" for d in dossies}
     else:
         if provedor in ("openai", "claude"):
             erro = "Chave de API não informada."
             usado = "python (fallback)"
         textos = _redigir_python(dossies)
+        fontes = {chave_dossie(d): "python" for d in dossies}
+
+    # controle de repetição: passa pela rodada inteira, na ordem do ranking,
+    # e tenta trocar por Python qualquer item de IA que colidiu com um
+    # anterior. Itens já vindos do Python só são reportados — recair no
+    # mesmo motor não resolveria a colisão.
+    controle = ControleRepeticao()
+    repeticoes: dict[str, list[str]] = {}
+    for d in dossies:
+        k = chave_dossie(d)
+        texto = textos.get(k, "")
+        probs = controle.checar(k, texto, d["time"], d["adversario"])
+        if probs and fontes.get(k) == "ia":
+            substituto = _redigir_python([d])[k]
+            probs_novo = controle.checar(k, substituto, d["time"], d["adversario"])
+            textos[k] = substituto
+            fontes[k] = "python (fallback repetição)"
+            if probs_novo:
+                repeticoes[k] = probs_novo
+        elif probs:
+            repeticoes[k] = probs
+        controle.registrar(k, textos[k], d["time"], d["adversario"])
+
+    # frases banidas / tom-vs-veredito, aplicado a TODO texto final,
+    # independente da origem — rede de segurança final.
+    for d in dossies:
+        k = chave_dossie(d)
+        extra = validar_paragrafo_fallback(textos[k], d)
+        if extra:
+            problemas_ia.setdefault(k, []).extend(extra)
 
     alertas = {
         chave_dossie(d): verificar_numeros(textos.get(chave_dossie(d), ""), d)
         for d in dossies
     }
-    return {"textos": textos, "alertas": alertas, "provedor_usado": usado,
+    return {"textos": textos, "alertas": alertas, "problemas_ia": problemas_ia,
+            "repeticoes": repeticoes, "fontes": fontes, "provedor_usado": usado,
             "segundos": round(time.monotonic() - t0, 1), "erro": erro}
 
 

@@ -1,6 +1,9 @@
 {
   "versao_modelo": "poisson-v1",
-  "treinado_em": "2026-08-06T21:02:48.138382+00:00",
+  "versao_dataset": "v1",
+  "treinado_em": "2026-08-06T21:17:25.100360+00:00",
+  "ultima_partida_usada_unix": 1785457800,
+  "ultima_partida_usada_data": "2026-07-31",
   "linhas_treino": 2530,
   "temporadas_treino": [
     "2023",
@@ -9,7 +12,8 @@
     "2026"
   ],
   "k_shrinkage": 2.0,
-  "escolhido_por": "backtest walk-forward 126 folds (2023-2026): Poisson venceu baseline, logística L2/elastic net e gradient boosting nos dois alvos em Brier, LogLoss, ROC AUC e erro de calibração — ver artifacts/evaluation_summary.json",
+  "hash_execucao": "6a7b800a72491b3d",
+  "escolhido_por": "backtest walk-forward 126 folds (2023-2026): Poisson teve o menor Brier Score e melhor calibração nos dois alvos entre baseline, logística L2/elastic net e gradient boosting — ver artifacts/evaluation_summary.json. A vantagem sobre a baseline é MODESTA e não passou no teste de significância a 95% (IC da diferença de Brier inclui zero nos dois alvos — ver artifacts/validacao_poisson.json). Poisson foi escolhido por robustez estrutural (deriva P(2+gols) e P(SG) da mesma distribuição, sem mistura posterior com score heurístico), estabilidade do ranking (correlação de Spearman ~0,91 sob reamostragem do treino) e simplicidade interpretável — não por vantagem preditiva grande comprovada.",
   "modelo_ataque_gols_marcados": {
     "features": [
       "xg_j3",
@@ -103,7 +107,14 @@
       0.007858005131245283,
       0.06980908515593504
     ],
-    "intercept": 0.2127590524475095
+    "intercept": 0.2127590524475095,
+    "faixas_probabilidade": {
+      "p10": 0.2713,
+      "p25": 0.3033,
+      "p50": 0.3511,
+      "p75": 0.4014,
+      "p90": 0.4483
+    }
   },
   "modelo_defesa_gols_sofridos": {
     "features": [
@@ -198,6 +209,13 @@
       0.007046406766855319,
       -0.06975387241829675
     ],
-    "intercept": 0.2127853995432069
+    "intercept": 0.2127853995432069,
+    "faixas_probabilidade": {
+      "p10": 0.2191,
+      "p25": 0.2513,
+      "p50": 0.2901,
+      "p75": 0.3307,
+      "p90": 0.3608
+    }
   }
 }
