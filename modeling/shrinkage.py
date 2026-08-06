@@ -40,13 +40,17 @@ def encolher_em_cadeia(
     Não pula direto para a média da liga só porque falta amostra no mesmo
     mando — primeiro empresta força do histórico geral da equipe (mesmo
     elenco/sistema, só sem separar por mando), e encolhe ESSE resultado em
-    direção à liga pela amostra geral disponível. Só then aplica o encolhimento
-    específico do mando sobre essa base.
+    direção à liga pela amostra geral disponível. Só então aplica o
+    encolhimento específico do mando sobre essa base.
 
-    Temporada anterior (item 4 da cadeia, seção 4) ainda não entra aqui: o
-    dataset builder hoje trabalha com uma temporada por vez. Ver TODO em
-    dataset_builder.py — entra quando o backtest multi-temporada (seção 6)
-    passar a alimentar séries de mais de um ano por equipe.
+    Temporada anterior (item 4 da cadeia, seção 4) é uma decisão TOMADA, não
+    pendente: scripts/build_dataset.py constrói cada temporada em separado
+    (reseta amostra_geral=0 a cada virada de ano) de propósito — o
+    Brasileirão troca ~20% do elenco entre temporadas (acesso/rebaixamento),
+    então herdar força de 2025 para o início de 2026 misturaria sinal de
+    times que nem estão mais na Série A. O shrinkage cobre o início de
+    temporada puxando para a média da LIGA (que já reflete o nível da
+    divisão naquele ano), não para o histórico do time no ano anterior.
     """
     base = encolher(media_geral, n_geral, media_liga, k)
     if media_mesmo_mando is None or n_mesmo_mando <= 0:

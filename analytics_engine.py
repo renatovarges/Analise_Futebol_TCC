@@ -1,30 +1,36 @@
 """
-analytics_engine.py — motor analítico (v2, sobre a base SofaScore).
+analytics_engine.py — camada de análise: dossiês, tabelas e ranking exibidos.
 
-ESTRUTURA DE ANÁLISE (três frentes, como o analista trabalha):
+PRODUÇÃO: analisar_rodada() deriva o RANKING do modelo Poisson validado por
+backtest walk-forward (modeling/prediction.py — ver artifacts/
+evaluation_summary.json e artifacts/validacao_poisson.json para os números
+reais e reproduzíveis). Este arquivo continua responsável por montar as
+séries históricas, os superlativos descritivos e o dossiê que alimenta a
+narrativa — só não decide mais a ORDEM do ranking nem o veredito por conta
+própria.
 
-    1. forças e fraquezas OFENSIVAS de um time
-    2. forças e fraquezas DEFENSIVAS do outro
-    3. o CRUZAMENTO entre as duas
+AUDITORIA: analisar_rodada_legado() é o motor ANTIGO (z-score por pool da
+própria rodada + termo de "potencialização" — produto dos z-scores quando
+mesmo sinal, zero quando sinal oposto). Foi aposentado da produção em
+2026-08-06 porque (a) a normalização só entre os ~10 mandantes/visitantes da
+rodada é instável — um valor extremo de UM time deslocava o z-score de
+TODOS os outros — e (b) a interação descontínua não tinha sustentação
+estatística testável. Os números de desempenho abaixo descrevem ESSE motor
+antigo, medidos quando ele ainda estava em produção — não descrevem
+analisar_rodada() atual. Mantido só como baseline de comparação em
+scripts/comparar_motores.py.
 
-O ponto que a versão anterior errava: ela somava as duas frentes. Somar trata
-"ataque bom contra defesa média" igual a "ataque bom contra defesa péssima".
-Aqui existe um terceiro termo — POTENCIALIZAÇÃO — que só é acionado quando
-força e fraqueza apontam para o mesmo lado, e é isso que separa o confronto
-bom do confronto ideal.
-
-O QUE FOI MEDIDO (Brasileirão 2026, 205 jogos, backtest fora da amostra):
+O QUE FOI MEDIDO DO MOTOR ANTIGO (Brasileirão 2026, 205 jogos, backtest
+fora da amostra, ANTES da aposentadoria):
 
   · terço superior do ranking DEFENSIVO conquista SG em 34-39% dos jogos,
-    contra 13-21% do terço inferior (média da liga: 25%). Sinal forte.
+    contra 13-21% do terço inferior (média da liga: 25%).
   · terço superior do ranking OFENSIVO marca 1,20-1,44 gols contra 1,09-1,27
-    do inferior (média 1,25). Sinal fraco — o índice ofensivo é honestamente
-    menos confiável que o defensivo, e o painel sinaliza isso.
-  · para prever GOL, janela de 3 jogos ganha; para prever xG, janela de 10.
-    Por isso as duas entram, com peso maior no recente.
+    do inferior (média 1,25).
   · gols marcados praticamente não preveem gols futuros (r≈0,02); métricas
-    territoriais (toques e chutes na área) preveem melhor. Os pesos refletem
-    isso — gol pesa pouco, território pesa muito.
+    territoriais (toques e chutes na área) preveem melhor — motivo pelo
+    qual o dataset do modelo novo (modeling/dataset_builder.py) também
+    prioriza essas métricas territoriais nas features curadas.
 """
 from __future__ import annotations
 
