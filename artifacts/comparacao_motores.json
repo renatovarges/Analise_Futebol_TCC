@@ -1,0 +1,2366 @@
+{
+  "n_rodadas_comparadas": 14,
+  "rodadas": [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+  ],
+  "ofensivo_top3": {
+    "novo": {
+      "acertos": 24,
+      "n": 40,
+      "taxa": 0.6
+    },
+    "antigo": {
+      "acertos": 16,
+      "n": 41,
+      "taxa": 0.3902
+    }
+  },
+  "ofensivo_top5": {
+    "novo": {
+      "acertos": 39,
+      "n": 67,
+      "taxa": 0.5821
+    },
+    "antigo": {
+      "acertos": 26,
+      "n": 67,
+      "taxa": 0.3881
+    }
+  },
+  "ofensivo_top6": {
+    "novo": {
+      "acertos": 44,
+      "n": 80,
+      "taxa": 0.55
+    },
+    "antigo": {
+      "acertos": 29,
+      "n": 81,
+      "taxa": 0.358
+    }
+  },
+  "defensivo_top3": {
+    "novo": {
+      "acertos": 19,
+      "n": 42,
+      "taxa": 0.4524
+    },
+    "antigo": {
+      "acertos": 16,
+      "n": 42,
+      "taxa": 0.381
+    }
+  },
+  "defensivo_top5": {
+    "novo": {
+      "acertos": 28,
+      "n": 70,
+      "taxa": 0.4
+    },
+    "antigo": {
+      "acertos": 27,
+      "n": 70,
+      "taxa": 0.3857
+    }
+  },
+  "defensivo_top6": {
+    "novo": {
+      "acertos": 33,
+      "n": 84,
+      "taxa": 0.3929
+    },
+    "antigo": {
+      "acertos": 32,
+      "n": 84,
+      "taxa": 0.381
+    }
+  },
+  "total_mudancas_grandes_posicao": 255,
+  "detalhe_por_rodada": [
+    {
+      "rodada": 8,
+      "ofensivo_top3_novo": [
+        2,
+        3
+      ],
+      "ofensivo_top3_antigo": [
+        2,
+        3
+      ],
+      "ofensivo_top5_novo": [
+        3,
+        5
+      ],
+      "ofensivo_top5_antigo": [
+        2,
+        5
+      ],
+      "ofensivo_top6_novo": [
+        3,
+        6
+      ],
+      "ofensivo_top6_antigo": [
+        2,
+        6
+      ],
+      "defensivo_top3_novo": [
+        1,
+        3
+      ],
+      "defensivo_top3_antigo": [
+        0,
+        3
+      ],
+      "defensivo_top5_novo": [
+        2,
+        5
+      ],
+      "defensivo_top5_antigo": [
+        2,
+        5
+      ],
+      "defensivo_top6_novo": [
+        2,
+        6
+      ],
+      "defensivo_top6_antigo": [
+        2,
+        6
+      ],
+      "mudancas_grandes": [
+        {
+          "time": "Bragantino",
+          "eixo": "ofensivo",
+          "pos_antigo": 14,
+          "pos_novo": 2
+        },
+        {
+          "time": "Athletico PR",
+          "eixo": "ofensivo",
+          "pos_antigo": 12,
+          "pos_novo": 4
+        },
+        {
+          "time": "Remo",
+          "eixo": "ofensivo",
+          "pos_antigo": 15,
+          "pos_novo": 7
+        },
+        {
+          "time": "Bahia",
+          "eixo": "ofensivo",
+          "pos_antigo": 4,
+          "pos_novo": 10
+        },
+        {
+          "time": "Santos",
+          "eixo": "ofensivo",
+          "pos_antigo": 1,
+          "pos_novo": 11
+        },
+        {
+          "time": "Mirassol",
+          "eixo": "ofensivo",
+          "pos_antigo": 7,
+          "pos_novo": 12
+        },
+        {
+          "time": "Corinthians",
+          "eixo": "ofensivo",
+          "pos_antigo": 20,
+          "pos_novo": 13
+        },
+        {
+          "time": "Flamengo",
+          "eixo": "ofensivo",
+          "pos_antigo": 5,
+          "pos_novo": 15
+        },
+        {
+          "time": "Palmeiras",
+          "eixo": "ofensivo",
+          "pos_antigo": 11,
+          "pos_novo": 19
+        },
+        {
+          "time": "Sao Paulo",
+          "eixo": "defensivo",
+          "pos_antigo": 10,
+          "pos_novo": 2
+        },
+        {
+          "time": "Internacional",
+          "eixo": "defensivo",
+          "pos_antigo": 8,
+          "pos_novo": 3
+        },
+        {
+          "time": "Corinthians",
+          "eixo": "defensivo",
+          "pos_antigo": 16,
+          "pos_novo": 6
+        },
+        {
+          "time": "Flamengo",
+          "eixo": "defensivo",
+          "pos_antigo": 1,
+          "pos_novo": 8
+        },
+        {
+          "time": "Cruzeiro",
+          "eixo": "defensivo",
+          "pos_antigo": 18,
+          "pos_novo": 10
+        },
+        {
+          "time": "Remo",
+          "eixo": "defensivo",
+          "pos_antigo": 19,
+          "pos_novo": 11
+        },
+        {
+          "time": "Mirassol",
+          "eixo": "defensivo",
+          "pos_antigo": 7,
+          "pos_novo": 12
+        },
+        {
+          "time": "Bahia",
+          "eixo": "defensivo",
+          "pos_antigo": 6,
+          "pos_novo": 14
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "defensivo",
+          "pos_antigo": 9,
+          "pos_novo": 16
+        },
+        {
+          "time": "Coritiba",
+          "eixo": "defensivo",
+          "pos_antigo": 12,
+          "pos_novo": 17
+        }
+      ]
+    },
+    {
+      "rodada": 9,
+      "ofensivo_top3_novo": [
+        3,
+        3
+      ],
+      "ofensivo_top3_antigo": [
+        2,
+        3
+      ],
+      "ofensivo_top5_novo": [
+        5,
+        5
+      ],
+      "ofensivo_top5_antigo": [
+        4,
+        5
+      ],
+      "ofensivo_top6_novo": [
+        6,
+        6
+      ],
+      "ofensivo_top6_antigo": [
+        4,
+        6
+      ],
+      "defensivo_top3_novo": [
+        1,
+        3
+      ],
+      "defensivo_top3_antigo": [
+        2,
+        3
+      ],
+      "defensivo_top5_novo": [
+        2,
+        5
+      ],
+      "defensivo_top5_antigo": [
+        2,
+        5
+      ],
+      "defensivo_top6_novo": [
+        3,
+        6
+      ],
+      "defensivo_top6_antigo": [
+        2,
+        6
+      ],
+      "mudancas_grandes": [
+        {
+          "time": "Santos",
+          "eixo": "ofensivo",
+          "pos_antigo": 8,
+          "pos_novo": 2
+        },
+        {
+          "time": "Cruzeiro",
+          "eixo": "ofensivo",
+          "pos_antigo": 11,
+          "pos_novo": 5
+        },
+        {
+          "time": "Vasco",
+          "eixo": "ofensivo",
+          "pos_antigo": 1,
+          "pos_novo": 10
+        },
+        {
+          "time": "Bragantino",
+          "eixo": "ofensivo",
+          "pos_antigo": 16,
+          "pos_novo": 11
+        },
+        {
+          "time": "Coritiba",
+          "eixo": "ofensivo",
+          "pos_antigo": 19,
+          "pos_novo": 14
+        },
+        {
+          "time": "Remo",
+          "eixo": "ofensivo",
+          "pos_antigo": 9,
+          "pos_novo": 15
+        },
+        {
+          "time": "Flamengo",
+          "eixo": "ofensivo",
+          "pos_antigo": 7,
+          "pos_novo": 16
+        },
+        {
+          "time": "Sao Paulo",
+          "eixo": "ofensivo",
+          "pos_antigo": 13,
+          "pos_novo": 20
+        },
+        {
+          "time": "Bragantino",
+          "eixo": "defensivo",
+          "pos_antigo": 13,
+          "pos_novo": 5
+        },
+        {
+          "time": "Santos",
+          "eixo": "defensivo",
+          "pos_antigo": 12,
+          "pos_novo": 6
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "defensivo",
+          "pos_antigo": 3,
+          "pos_novo": 9
+        },
+        {
+          "time": "Flamengo",
+          "eixo": "defensivo",
+          "pos_antigo": 4,
+          "pos_novo": 10
+        },
+        {
+          "time": "Coritiba",
+          "eixo": "defensivo",
+          "pos_antigo": 20,
+          "pos_novo": 11
+        }
+      ]
+    },
+    {
+      "rodada": 10,
+      "ofensivo_top3_novo": [
+        1,
+        3
+      ],
+      "ofensivo_top3_antigo": [
+        0,
+        3
+      ],
+      "ofensivo_top5_novo": [
+        3,
+        5
+      ],
+      "ofensivo_top5_antigo": [
+        1,
+        5
+      ],
+      "ofensivo_top6_novo": [
+        3,
+        6
+      ],
+      "ofensivo_top6_antigo": [
+        1,
+        6
+      ],
+      "defensivo_top3_novo": [
+        0,
+        3
+      ],
+      "defensivo_top3_antigo": [
+        1,
+        3
+      ],
+      "defensivo_top5_novo": [
+        1,
+        5
+      ],
+      "defensivo_top5_antigo": [
+        1,
+        5
+      ],
+      "defensivo_top6_novo": [
+        1,
+        6
+      ],
+      "defensivo_top6_antigo": [
+        1,
+        6
+      ],
+      "mudancas_grandes": [
+        {
+          "time": "Atletico MG",
+          "eixo": "ofensivo",
+          "pos_antigo": 10,
+          "pos_novo": 3
+        },
+        {
+          "time": "Chapecoense",
+          "eixo": "ofensivo",
+          "pos_antigo": 12,
+          "pos_novo": 7
+        },
+        {
+          "time": "Bahia",
+          "eixo": "ofensivo",
+          "pos_antigo": 14,
+          "pos_novo": 8
+        },
+        {
+          "time": "Coritiba",
+          "eixo": "ofensivo",
+          "pos_antigo": 20,
+          "pos_novo": 9
+        },
+        {
+          "time": "Bragantino",
+          "eixo": "ofensivo",
+          "pos_antigo": 2,
+          "pos_novo": 11
+        },
+        {
+          "time": "Corinthians",
+          "eixo": "ofensivo",
+          "pos_antigo": 19,
+          "pos_novo": 12
+        },
+        {
+          "time": "Athletico PR",
+          "eixo": "ofensivo",
+          "pos_antigo": 6,
+          "pos_novo": 13
+        },
+        {
+          "time": "Fluminense",
+          "eixo": "ofensivo",
+          "pos_antigo": 4,
+          "pos_novo": 14
+        },
+        {
+          "time": "Internacional",
+          "eixo": "ofensivo",
+          "pos_antigo": 8,
+          "pos_novo": 15
+        },
+        {
+          "time": "Cruzeiro",
+          "eixo": "ofensivo",
+          "pos_antigo": 13,
+          "pos_novo": 20
+        },
+        {
+          "time": "Sao Paulo",
+          "eixo": "defensivo",
+          "pos_antigo": 6,
+          "pos_novo": 1
+        },
+        {
+          "time": "Coritiba",
+          "eixo": "defensivo",
+          "pos_antigo": 13,
+          "pos_novo": 7
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "defensivo",
+          "pos_antigo": 18,
+          "pos_novo": 8
+        },
+        {
+          "time": "Internacional",
+          "eixo": "defensivo",
+          "pos_antigo": 2,
+          "pos_novo": 9
+        },
+        {
+          "time": "Mirassol",
+          "eixo": "defensivo",
+          "pos_antigo": 19,
+          "pos_novo": 10
+        },
+        {
+          "time": "Chapecoense",
+          "eixo": "defensivo",
+          "pos_antigo": 16,
+          "pos_novo": 11
+        },
+        {
+          "time": "Fluminense",
+          "eixo": "defensivo",
+          "pos_antigo": 1,
+          "pos_novo": 12
+        },
+        {
+          "time": "Palmeiras",
+          "eixo": "defensivo",
+          "pos_antigo": 3,
+          "pos_novo": 13
+        },
+        {
+          "time": "Athletico PR",
+          "eixo": "defensivo",
+          "pos_antigo": 12,
+          "pos_novo": 18
+        }
+      ]
+    },
+    {
+      "rodada": 11,
+      "ofensivo_top3_novo": [
+        1,
+        3
+      ],
+      "ofensivo_top3_antigo": [
+        0,
+        3
+      ],
+      "ofensivo_top5_novo": [
+        2,
+        5
+      ],
+      "ofensivo_top5_antigo": [
+        1,
+        5
+      ],
+      "ofensivo_top6_novo": [
+        2,
+        6
+      ],
+      "ofensivo_top6_antigo": [
+        1,
+        6
+      ],
+      "defensivo_top3_novo": [
+        3,
+        3
+      ],
+      "defensivo_top3_antigo": [
+        2,
+        3
+      ],
+      "defensivo_top5_novo": [
+        3,
+        5
+      ],
+      "defensivo_top5_antigo": [
+        3,
+        5
+      ],
+      "defensivo_top6_novo": [
+        3,
+        6
+      ],
+      "defensivo_top6_antigo": [
+        4,
+        6
+      ],
+      "mudancas_grandes": [
+        {
+          "time": "Cruzeiro",
+          "eixo": "ofensivo",
+          "pos_antigo": 12,
+          "pos_novo": 5
+        },
+        {
+          "time": "Remo",
+          "eixo": "ofensivo",
+          "pos_antigo": 11,
+          "pos_novo": 6
+        },
+        {
+          "time": "Botafogo",
+          "eixo": "ofensivo",
+          "pos_antigo": 13,
+          "pos_novo": 7
+        },
+        {
+          "time": "Vasco",
+          "eixo": "ofensivo",
+          "pos_antigo": 1,
+          "pos_novo": 8
+        },
+        {
+          "time": "Santos",
+          "eixo": "ofensivo",
+          "pos_antigo": 19,
+          "pos_novo": 10
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "ofensivo",
+          "pos_antigo": 6,
+          "pos_novo": 11
+        },
+        {
+          "time": "Bragantino",
+          "eixo": "ofensivo",
+          "pos_antigo": 4,
+          "pos_novo": 15
+        },
+        {
+          "time": "Flamengo",
+          "eixo": "ofensivo",
+          "pos_antigo": 10,
+          "pos_novo": 17
+        },
+        {
+          "time": "Fluminense",
+          "eixo": "defensivo",
+          "pos_antigo": 11,
+          "pos_novo": 4
+        },
+        {
+          "time": "Cruzeiro",
+          "eixo": "defensivo",
+          "pos_antigo": 13,
+          "pos_novo": 6
+        },
+        {
+          "time": "Mirassol",
+          "eixo": "defensivo",
+          "pos_antigo": 18,
+          "pos_novo": 9
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "defensivo",
+          "pos_antigo": 4,
+          "pos_novo": 11
+        },
+        {
+          "time": "Remo",
+          "eixo": "defensivo",
+          "pos_antigo": 20,
+          "pos_novo": 13
+        },
+        {
+          "time": "Coritiba",
+          "eixo": "defensivo",
+          "pos_antigo": 8,
+          "pos_novo": 14
+        },
+        {
+          "time": "Vasco",
+          "eixo": "defensivo",
+          "pos_antigo": 10,
+          "pos_novo": 15
+        },
+        {
+          "time": "Bragantino",
+          "eixo": "defensivo",
+          "pos_antigo": 9,
+          "pos_novo": 16
+        },
+        {
+          "time": "Flamengo",
+          "eixo": "defensivo",
+          "pos_antigo": 12,
+          "pos_novo": 17
+        }
+      ]
+    },
+    {
+      "rodada": 12,
+      "ofensivo_top3_novo": [
+        2,
+        3
+      ],
+      "ofensivo_top3_antigo": [
+        2,
+        3
+      ],
+      "ofensivo_top5_novo": [
+        3,
+        5
+      ],
+      "ofensivo_top5_antigo": [
+        3,
+        5
+      ],
+      "ofensivo_top6_novo": [
+        4,
+        6
+      ],
+      "ofensivo_top6_antigo": [
+        3,
+        6
+      ],
+      "defensivo_top3_novo": [
+        2,
+        3
+      ],
+      "defensivo_top3_antigo": [
+        1,
+        3
+      ],
+      "defensivo_top5_novo": [
+        3,
+        5
+      ],
+      "defensivo_top5_antigo": [
+        3,
+        5
+      ],
+      "defensivo_top6_novo": [
+        3,
+        6
+      ],
+      "defensivo_top6_antigo": [
+        4,
+        6
+      ],
+      "mudancas_grandes": [
+        {
+          "time": "Internacional",
+          "eixo": "ofensivo",
+          "pos_antigo": 10,
+          "pos_novo": 5
+        },
+        {
+          "time": "Cruzeiro",
+          "eixo": "ofensivo",
+          "pos_antigo": 13,
+          "pos_novo": 6
+        },
+        {
+          "time": "Coritiba",
+          "eixo": "ofensivo",
+          "pos_antigo": 18,
+          "pos_novo": 7
+        },
+        {
+          "time": "Santos",
+          "eixo": "ofensivo",
+          "pos_antigo": 19,
+          "pos_novo": 10
+        },
+        {
+          "time": "Fluminense",
+          "eixo": "ofensivo",
+          "pos_antigo": 3,
+          "pos_novo": 12
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "ofensivo",
+          "pos_antigo": 5,
+          "pos_novo": 13
+        },
+        {
+          "time": "Sao Paulo",
+          "eixo": "ofensivo",
+          "pos_antigo": 9,
+          "pos_novo": 15
+        },
+        {
+          "time": "Bahia",
+          "eixo": "ofensivo",
+          "pos_antigo": 11,
+          "pos_novo": 16
+        },
+        {
+          "time": "Mirassol",
+          "eixo": "ofensivo",
+          "pos_antigo": 12,
+          "pos_novo": 18
+        },
+        {
+          "time": "Internacional",
+          "eixo": "defensivo",
+          "pos_antigo": 9,
+          "pos_novo": 3
+        },
+        {
+          "time": "Vasco",
+          "eixo": "defensivo",
+          "pos_antigo": 14,
+          "pos_novo": 6
+        },
+        {
+          "time": "Coritiba",
+          "eixo": "defensivo",
+          "pos_antigo": 15,
+          "pos_novo": 8
+        },
+        {
+          "time": "Santos",
+          "eixo": "defensivo",
+          "pos_antigo": 16,
+          "pos_novo": 9
+        },
+        {
+          "time": "Fluminense",
+          "eixo": "defensivo",
+          "pos_antigo": 2,
+          "pos_novo": 11
+        },
+        {
+          "time": "Athletico PR",
+          "eixo": "defensivo",
+          "pos_antigo": 17,
+          "pos_novo": 12
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "defensivo",
+          "pos_antigo": 3,
+          "pos_novo": 15
+        }
+      ]
+    },
+    {
+      "rodada": 13,
+      "ofensivo_top3_novo": [
+        2,
+        3
+      ],
+      "ofensivo_top3_antigo": [
+        2,
+        3
+      ],
+      "ofensivo_top5_novo": [
+        3,
+        5
+      ],
+      "ofensivo_top5_antigo": [
+        4,
+        5
+      ],
+      "ofensivo_top6_novo": [
+        3,
+        6
+      ],
+      "ofensivo_top6_antigo": [
+        4,
+        6
+      ],
+      "defensivo_top3_novo": [
+        1,
+        3
+      ],
+      "defensivo_top3_antigo": [
+        1,
+        3
+      ],
+      "defensivo_top5_novo": [
+        2,
+        5
+      ],
+      "defensivo_top5_antigo": [
+        1,
+        5
+      ],
+      "defensivo_top6_novo": [
+        3,
+        6
+      ],
+      "defensivo_top6_antigo": [
+        2,
+        6
+      ],
+      "mudancas_grandes": [
+        {
+          "time": "Sao Paulo",
+          "eixo": "ofensivo",
+          "pos_antigo": 10,
+          "pos_novo": 2
+        },
+        {
+          "time": "Gremio",
+          "eixo": "ofensivo",
+          "pos_antigo": 11,
+          "pos_novo": 4
+        },
+        {
+          "time": "Remo",
+          "eixo": "ofensivo",
+          "pos_antigo": 12,
+          "pos_novo": 6
+        },
+        {
+          "time": "Cruzeiro",
+          "eixo": "ofensivo",
+          "pos_antigo": 2,
+          "pos_novo": 7
+        },
+        {
+          "time": "Internacional",
+          "eixo": "ofensivo",
+          "pos_antigo": 3,
+          "pos_novo": 8
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "ofensivo",
+          "pos_antigo": 17,
+          "pos_novo": 10
+        },
+        {
+          "time": "Corinthians",
+          "eixo": "ofensivo",
+          "pos_antigo": 19,
+          "pos_novo": 12
+        },
+        {
+          "time": "Flamengo",
+          "eixo": "ofensivo",
+          "pos_antigo": 5,
+          "pos_novo": 13
+        },
+        {
+          "time": "Coritiba",
+          "eixo": "ofensivo",
+          "pos_antigo": 8,
+          "pos_novo": 14
+        },
+        {
+          "time": "Mirassol",
+          "eixo": "ofensivo",
+          "pos_antigo": 6,
+          "pos_novo": 17
+        },
+        {
+          "time": "Vasco",
+          "eixo": "ofensivo",
+          "pos_antigo": 13,
+          "pos_novo": 18
+        },
+        {
+          "time": "Sao Paulo",
+          "eixo": "defensivo",
+          "pos_antigo": 9,
+          "pos_novo": 4
+        },
+        {
+          "time": "Gremio",
+          "eixo": "defensivo",
+          "pos_antigo": 12,
+          "pos_novo": 6
+        },
+        {
+          "time": "Fluminense",
+          "eixo": "defensivo",
+          "pos_antigo": 16,
+          "pos_novo": 7
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "defensivo",
+          "pos_antigo": 15,
+          "pos_novo": 8
+        },
+        {
+          "time": "Vasco",
+          "eixo": "defensivo",
+          "pos_antigo": 3,
+          "pos_novo": 9
+        },
+        {
+          "time": "Palmeiras",
+          "eixo": "defensivo",
+          "pos_antigo": 2,
+          "pos_novo": 10
+        },
+        {
+          "time": "Botafogo",
+          "eixo": "defensivo",
+          "pos_antigo": 18,
+          "pos_novo": 12
+        },
+        {
+          "time": "Remo",
+          "eixo": "defensivo",
+          "pos_antigo": 19,
+          "pos_novo": 13
+        },
+        {
+          "time": "Internacional",
+          "eixo": "defensivo",
+          "pos_antigo": 8,
+          "pos_novo": 14
+        },
+        {
+          "time": "Coritiba",
+          "eixo": "defensivo",
+          "pos_antigo": 11,
+          "pos_novo": 17
+        },
+        {
+          "time": "Mirassol",
+          "eixo": "defensivo",
+          "pos_antigo": 10,
+          "pos_novo": 19
+        }
+      ]
+    },
+    {
+      "rodada": 14,
+      "ofensivo_top3_novo": [
+        2,
+        3
+      ],
+      "ofensivo_top3_antigo": [
+        1,
+        3
+      ],
+      "ofensivo_top5_novo": [
+        2,
+        5
+      ],
+      "ofensivo_top5_antigo": [
+        2,
+        5
+      ],
+      "ofensivo_top6_novo": [
+        3,
+        6
+      ],
+      "ofensivo_top6_antigo": [
+        3,
+        6
+      ],
+      "defensivo_top3_novo": [
+        1,
+        3
+      ],
+      "defensivo_top3_antigo": [
+        1,
+        3
+      ],
+      "defensivo_top5_novo": [
+        1,
+        5
+      ],
+      "defensivo_top5_antigo": [
+        1,
+        5
+      ],
+      "defensivo_top6_novo": [
+        1,
+        6
+      ],
+      "defensivo_top6_antigo": [
+        1,
+        6
+      ],
+      "mudancas_grandes": [
+        {
+          "time": "Sao Paulo",
+          "eixo": "ofensivo",
+          "pos_antigo": 6,
+          "pos_novo": 1
+        },
+        {
+          "time": "Cruzeiro",
+          "eixo": "ofensivo",
+          "pos_antigo": 13,
+          "pos_novo": 5
+        },
+        {
+          "time": "Vitoria",
+          "eixo": "ofensivo",
+          "pos_antigo": 15,
+          "pos_novo": 7
+        },
+        {
+          "time": "Mirassol",
+          "eixo": "ofensivo",
+          "pos_antigo": 18,
+          "pos_novo": 11
+        },
+        {
+          "time": "Coritiba",
+          "eixo": "ofensivo",
+          "pos_antigo": 19,
+          "pos_novo": 13
+        },
+        {
+          "time": "Fluminense",
+          "eixo": "ofensivo",
+          "pos_antigo": 3,
+          "pos_novo": 14
+        },
+        {
+          "time": "Bahia",
+          "eixo": "ofensivo",
+          "pos_antigo": 5,
+          "pos_novo": 16
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "ofensivo",
+          "pos_antigo": 7,
+          "pos_novo": 18
+        },
+        {
+          "time": "Cruzeiro",
+          "eixo": "defensivo",
+          "pos_antigo": 9,
+          "pos_novo": 3
+        },
+        {
+          "time": "Sao Paulo",
+          "eixo": "defensivo",
+          "pos_antigo": 13,
+          "pos_novo": 5
+        },
+        {
+          "time": "Vitoria",
+          "eixo": "defensivo",
+          "pos_antigo": 2,
+          "pos_novo": 7
+        },
+        {
+          "time": "Internacional",
+          "eixo": "defensivo",
+          "pos_antigo": 16,
+          "pos_novo": 8
+        },
+        {
+          "time": "Mirassol",
+          "eixo": "defensivo",
+          "pos_antigo": 17,
+          "pos_novo": 9
+        },
+        {
+          "time": "Corinthians",
+          "eixo": "defensivo",
+          "pos_antigo": 3,
+          "pos_novo": 10
+        },
+        {
+          "time": "Vasco",
+          "eixo": "defensivo",
+          "pos_antigo": 5,
+          "pos_novo": 15
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "defensivo",
+          "pos_antigo": 7,
+          "pos_novo": 16
+        }
+      ]
+    },
+    {
+      "rodada": 15,
+      "ofensivo_top3_novo": [
+        1,
+        3
+      ],
+      "ofensivo_top3_antigo": [
+        1,
+        3
+      ],
+      "ofensivo_top5_novo": [
+        2,
+        5
+      ],
+      "ofensivo_top5_antigo": [
+        2,
+        5
+      ],
+      "ofensivo_top6_novo": [
+        2,
+        6
+      ],
+      "ofensivo_top6_antigo": [
+        2,
+        6
+      ],
+      "defensivo_top3_novo": [
+        1,
+        3
+      ],
+      "defensivo_top3_antigo": [
+        0,
+        3
+      ],
+      "defensivo_top5_novo": [
+        1,
+        5
+      ],
+      "defensivo_top5_antigo": [
+        1,
+        5
+      ],
+      "defensivo_top6_novo": [
+        2,
+        6
+      ],
+      "defensivo_top6_antigo": [
+        1,
+        6
+      ],
+      "mudancas_grandes": [
+        {
+          "time": "Atletico MG",
+          "eixo": "ofensivo",
+          "pos_antigo": 9,
+          "pos_novo": 3
+        },
+        {
+          "time": "Santos",
+          "eixo": "ofensivo",
+          "pos_antigo": 15,
+          "pos_novo": 4
+        },
+        {
+          "time": "Gremio",
+          "eixo": "ofensivo",
+          "pos_antigo": 14,
+          "pos_novo": 5
+        },
+        {
+          "time": "Corinthians",
+          "eixo": "ofensivo",
+          "pos_antigo": 19,
+          "pos_novo": 8
+        },
+        {
+          "time": "Coritiba",
+          "eixo": "ofensivo",
+          "pos_antigo": 18,
+          "pos_novo": 9
+        },
+        {
+          "time": "Remo",
+          "eixo": "ofensivo",
+          "pos_antigo": 20,
+          "pos_novo": 10
+        },
+        {
+          "time": "Cruzeiro",
+          "eixo": "ofensivo",
+          "pos_antigo": 5,
+          "pos_novo": 11
+        },
+        {
+          "time": "Flamengo",
+          "eixo": "ofensivo",
+          "pos_antigo": 6,
+          "pos_novo": 12
+        },
+        {
+          "time": "Internacional",
+          "eixo": "ofensivo",
+          "pos_antigo": 8,
+          "pos_novo": 13
+        },
+        {
+          "time": "Botafogo",
+          "eixo": "ofensivo",
+          "pos_antigo": 2,
+          "pos_novo": 14
+        },
+        {
+          "time": "Bragantino",
+          "eixo": "ofensivo",
+          "pos_antigo": 11,
+          "pos_novo": 18
+        },
+        {
+          "time": "Vitoria",
+          "eixo": "ofensivo",
+          "pos_antigo": 10,
+          "pos_novo": 19
+        },
+        {
+          "time": "Mirassol",
+          "eixo": "defensivo",
+          "pos_antigo": 16,
+          "pos_novo": 1
+        },
+        {
+          "time": "Fluminense",
+          "eixo": "defensivo",
+          "pos_antigo": 15,
+          "pos_novo": 2
+        },
+        {
+          "time": "Remo",
+          "eixo": "defensivo",
+          "pos_antigo": 10,
+          "pos_novo": 5
+        },
+        {
+          "time": "Vasco",
+          "eixo": "defensivo",
+          "pos_antigo": 13,
+          "pos_novo": 6
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "defensivo",
+          "pos_antigo": 18,
+          "pos_novo": 7
+        },
+        {
+          "time": "Bahia",
+          "eixo": "defensivo",
+          "pos_antigo": 17,
+          "pos_novo": 10
+        },
+        {
+          "time": "Palmeiras",
+          "eixo": "defensivo",
+          "pos_antigo": 1,
+          "pos_novo": 11
+        },
+        {
+          "time": "Internacional",
+          "eixo": "defensivo",
+          "pos_antigo": 4,
+          "pos_novo": 12
+        },
+        {
+          "time": "Sao Paulo",
+          "eixo": "defensivo",
+          "pos_antigo": 2,
+          "pos_novo": 13
+        },
+        {
+          "time": "Athletico PR",
+          "eixo": "defensivo",
+          "pos_antigo": 9,
+          "pos_novo": 15
+        },
+        {
+          "time": "Flamengo",
+          "eixo": "defensivo",
+          "pos_antigo": 7,
+          "pos_novo": 16
+        },
+        {
+          "time": "Bragantino",
+          "eixo": "defensivo",
+          "pos_antigo": 6,
+          "pos_novo": 17
+        }
+      ]
+    },
+    {
+      "rodada": 16,
+      "ofensivo_top3_novo": [
+        2,
+        3
+      ],
+      "ofensivo_top3_antigo": [
+        2,
+        3
+      ],
+      "ofensivo_top5_novo": [
+        4,
+        5
+      ],
+      "ofensivo_top5_antigo": [
+        3,
+        5
+      ],
+      "ofensivo_top6_novo": [
+        4,
+        6
+      ],
+      "ofensivo_top6_antigo": [
+        3,
+        6
+      ],
+      "defensivo_top3_novo": [
+        1,
+        3
+      ],
+      "defensivo_top3_antigo": [
+        1,
+        3
+      ],
+      "defensivo_top5_novo": [
+        1,
+        5
+      ],
+      "defensivo_top5_antigo": [
+        1,
+        5
+      ],
+      "defensivo_top6_novo": [
+        1,
+        6
+      ],
+      "defensivo_top6_antigo": [
+        1,
+        6
+      ],
+      "mudancas_grandes": [
+        {
+          "time": "Santos",
+          "eixo": "ofensivo",
+          "pos_antigo": 10,
+          "pos_novo": 1
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "ofensivo",
+          "pos_antigo": 14,
+          "pos_novo": 4
+        },
+        {
+          "time": "Bahia",
+          "eixo": "ofensivo",
+          "pos_antigo": 15,
+          "pos_novo": 6
+        },
+        {
+          "time": "Athletico PR",
+          "eixo": "ofensivo",
+          "pos_antigo": 16,
+          "pos_novo": 8
+        },
+        {
+          "time": "Remo",
+          "eixo": "ofensivo",
+          "pos_antigo": 4,
+          "pos_novo": 10
+        },
+        {
+          "time": "Palmeiras",
+          "eixo": "ofensivo",
+          "pos_antigo": 17,
+          "pos_novo": 11
+        },
+        {
+          "time": "Sao Paulo",
+          "eixo": "ofensivo",
+          "pos_antigo": 5,
+          "pos_novo": 13
+        },
+        {
+          "time": "Mirassol",
+          "eixo": "ofensivo",
+          "pos_antigo": 3,
+          "pos_novo": 14
+        },
+        {
+          "time": "Flamengo",
+          "eixo": "ofensivo",
+          "pos_antigo": 6,
+          "pos_novo": 16
+        },
+        {
+          "time": "Vasco",
+          "eixo": "ofensivo",
+          "pos_antigo": 7,
+          "pos_novo": 17
+        },
+        {
+          "time": "Cruzeiro",
+          "eixo": "ofensivo",
+          "pos_antigo": 9,
+          "pos_novo": 19
+        },
+        {
+          "time": "Palmeiras",
+          "eixo": "defensivo",
+          "pos_antigo": 10,
+          "pos_novo": 2
+        },
+        {
+          "time": "Internacional",
+          "eixo": "defensivo",
+          "pos_antigo": 13,
+          "pos_novo": 4
+        },
+        {
+          "time": "Fluminense",
+          "eixo": "defensivo",
+          "pos_antigo": 16,
+          "pos_novo": 7
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "defensivo",
+          "pos_antigo": 19,
+          "pos_novo": 8
+        },
+        {
+          "time": "Bahia",
+          "eixo": "defensivo",
+          "pos_antigo": 14,
+          "pos_novo": 9
+        },
+        {
+          "time": "Cruzeiro",
+          "eixo": "defensivo",
+          "pos_antigo": 5,
+          "pos_novo": 10
+        },
+        {
+          "time": "Chapecoense",
+          "eixo": "defensivo",
+          "pos_antigo": 18,
+          "pos_novo": 11
+        },
+        {
+          "time": "Corinthians",
+          "eixo": "defensivo",
+          "pos_antigo": 6,
+          "pos_novo": 12
+        },
+        {
+          "time": "Flamengo",
+          "eixo": "defensivo",
+          "pos_antigo": 2,
+          "pos_novo": 13
+        },
+        {
+          "time": "Gremio",
+          "eixo": "defensivo",
+          "pos_antigo": 4,
+          "pos_novo": 15
+        },
+        {
+          "time": "Vasco",
+          "eixo": "defensivo",
+          "pos_antigo": 9,
+          "pos_novo": 16
+        },
+        {
+          "time": "Mirassol",
+          "eixo": "defensivo",
+          "pos_antigo": 11,
+          "pos_novo": 17
+        },
+        {
+          "time": "Coritiba",
+          "eixo": "defensivo",
+          "pos_antigo": 15,
+          "pos_novo": 20
+        }
+      ]
+    },
+    {
+      "rodada": 17,
+      "ofensivo_top3_novo": [
+        2,
+        3
+      ],
+      "ofensivo_top3_antigo": [
+        2,
+        3
+      ],
+      "ofensivo_top5_novo": [
+        3,
+        5
+      ],
+      "ofensivo_top5_antigo": [
+        2,
+        5
+      ],
+      "ofensivo_top6_novo": [
+        4,
+        6
+      ],
+      "ofensivo_top6_antigo": [
+        2,
+        6
+      ],
+      "defensivo_top3_novo": [
+        1,
+        3
+      ],
+      "defensivo_top3_antigo": [
+        1,
+        3
+      ],
+      "defensivo_top5_novo": [
+        2,
+        5
+      ],
+      "defensivo_top5_antigo": [
+        2,
+        5
+      ],
+      "defensivo_top6_novo": [
+        3,
+        6
+      ],
+      "defensivo_top6_antigo": [
+        2,
+        6
+      ],
+      "mudancas_grandes": [
+        {
+          "time": "Coritiba",
+          "eixo": "ofensivo",
+          "pos_antigo": 13,
+          "pos_novo": 3
+        },
+        {
+          "time": "Flamengo",
+          "eixo": "ofensivo",
+          "pos_antigo": 12,
+          "pos_novo": 7
+        },
+        {
+          "time": "Remo",
+          "eixo": "ofensivo",
+          "pos_antigo": 19,
+          "pos_novo": 10
+        },
+        {
+          "time": "Botafogo",
+          "eixo": "ofensivo",
+          "pos_antigo": 4,
+          "pos_novo": 11
+        },
+        {
+          "time": "Corinthians",
+          "eixo": "ofensivo",
+          "pos_antigo": 18,
+          "pos_novo": 12
+        },
+        {
+          "time": "Bragantino",
+          "eixo": "ofensivo",
+          "pos_antigo": 8,
+          "pos_novo": 16
+        },
+        {
+          "time": "Fluminense",
+          "eixo": "ofensivo",
+          "pos_antigo": 6,
+          "pos_novo": 17
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "ofensivo",
+          "pos_antigo": 10,
+          "pos_novo": 19
+        },
+        {
+          "time": "Corinthians",
+          "eixo": "defensivo",
+          "pos_antigo": 8,
+          "pos_novo": 2
+        },
+        {
+          "time": "Mirassol",
+          "eixo": "defensivo",
+          "pos_antigo": 14,
+          "pos_novo": 4
+        },
+        {
+          "time": "Vasco",
+          "eixo": "defensivo",
+          "pos_antigo": 12,
+          "pos_novo": 5
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "defensivo",
+          "pos_antigo": 3,
+          "pos_novo": 9
+        },
+        {
+          "time": "Sao Paulo",
+          "eixo": "defensivo",
+          "pos_antigo": 18,
+          "pos_novo": 10
+        },
+        {
+          "time": "Athletico PR",
+          "eixo": "defensivo",
+          "pos_antigo": 5,
+          "pos_novo": 11
+        },
+        {
+          "time": "Palmeiras",
+          "eixo": "defensivo",
+          "pos_antigo": 4,
+          "pos_novo": 14
+        },
+        {
+          "time": "Bahia",
+          "eixo": "defensivo",
+          "pos_antigo": 11,
+          "pos_novo": 18
+        }
+      ]
+    },
+    {
+      "rodada": 18,
+      "ofensivo_top3_novo": [
+        2,
+        3
+      ],
+      "ofensivo_top3_antigo": [
+        1,
+        3
+      ],
+      "ofensivo_top5_novo": [
+        3,
+        5
+      ],
+      "ofensivo_top5_antigo": [
+        1,
+        5
+      ],
+      "ofensivo_top6_novo": [
+        3,
+        6
+      ],
+      "ofensivo_top6_antigo": [
+        1,
+        6
+      ],
+      "defensivo_top3_novo": [
+        2,
+        3
+      ],
+      "defensivo_top3_antigo": [
+        2,
+        3
+      ],
+      "defensivo_top5_novo": [
+        3,
+        5
+      ],
+      "defensivo_top5_antigo": [
+        3,
+        5
+      ],
+      "defensivo_top6_novo": [
+        3,
+        6
+      ],
+      "defensivo_top6_antigo": [
+        3,
+        6
+      ],
+      "mudancas_grandes": [
+        {
+          "time": "Santos",
+          "eixo": "ofensivo",
+          "pos_antigo": 8,
+          "pos_novo": 2
+        },
+        {
+          "time": "Bahia",
+          "eixo": "ofensivo",
+          "pos_antigo": 11,
+          "pos_novo": 5
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "ofensivo",
+          "pos_antigo": 1,
+          "pos_novo": 7
+        },
+        {
+          "time": "Sao Paulo",
+          "eixo": "ofensivo",
+          "pos_antigo": 2,
+          "pos_novo": 9
+        },
+        {
+          "time": "Remo",
+          "eixo": "ofensivo",
+          "pos_antigo": 18,
+          "pos_novo": 10
+        },
+        {
+          "time": "Botafogo",
+          "eixo": "ofensivo",
+          "pos_antigo": 4,
+          "pos_novo": 11
+        },
+        {
+          "time": "Gremio",
+          "eixo": "ofensivo",
+          "pos_antigo": 19,
+          "pos_novo": 13
+        },
+        {
+          "time": "Coritiba",
+          "eixo": "ofensivo",
+          "pos_antigo": 7,
+          "pos_novo": 15
+        },
+        {
+          "time": "Mirassol",
+          "eixo": "ofensivo",
+          "pos_antigo": 14,
+          "pos_novo": 19
+        },
+        {
+          "time": "Santos",
+          "eixo": "defensivo",
+          "pos_antigo": 9,
+          "pos_novo": 4
+        },
+        {
+          "time": "Flamengo",
+          "eixo": "defensivo",
+          "pos_antigo": 13,
+          "pos_novo": 5
+        },
+        {
+          "time": "Corinthians",
+          "eixo": "defensivo",
+          "pos_antigo": 2,
+          "pos_novo": 8
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "defensivo",
+          "pos_antigo": 3,
+          "pos_novo": 9
+        },
+        {
+          "time": "Bahia",
+          "eixo": "defensivo",
+          "pos_antigo": 15,
+          "pos_novo": 10
+        },
+        {
+          "time": "Remo",
+          "eixo": "defensivo",
+          "pos_antigo": 19,
+          "pos_novo": 12
+        },
+        {
+          "time": "Internacional",
+          "eixo": "defensivo",
+          "pos_antigo": 8,
+          "pos_novo": 13
+        },
+        {
+          "time": "Vasco",
+          "eixo": "defensivo",
+          "pos_antigo": 20,
+          "pos_novo": 14
+        },
+        {
+          "time": "Botafogo",
+          "eixo": "defensivo",
+          "pos_antigo": 10,
+          "pos_novo": 16
+        }
+      ]
+    },
+    {
+      "rodada": 19,
+      "ofensivo_top3_novo": [
+        2,
+        3
+      ],
+      "ofensivo_top3_antigo": [
+        1,
+        3
+      ],
+      "ofensivo_top5_novo": [
+        4,
+        5
+      ],
+      "ofensivo_top5_antigo": [
+        1,
+        5
+      ],
+      "ofensivo_top6_novo": [
+        4,
+        6
+      ],
+      "ofensivo_top6_antigo": [
+        2,
+        6
+      ],
+      "defensivo_top3_novo": [
+        1,
+        3
+      ],
+      "defensivo_top3_antigo": [
+        1,
+        3
+      ],
+      "defensivo_top5_novo": [
+        2,
+        5
+      ],
+      "defensivo_top5_antigo": [
+        2,
+        5
+      ],
+      "defensivo_top6_novo": [
+        2,
+        6
+      ],
+      "defensivo_top6_antigo": [
+        3,
+        6
+      ],
+      "mudancas_grandes": [
+        {
+          "time": "Corinthians",
+          "eixo": "ofensivo",
+          "pos_antigo": 10,
+          "pos_novo": 3
+        },
+        {
+          "time": "Mirassol",
+          "eixo": "ofensivo",
+          "pos_antigo": 12,
+          "pos_novo": 4
+        },
+        {
+          "time": "Vitoria",
+          "eixo": "ofensivo",
+          "pos_antigo": 14,
+          "pos_novo": 6
+        },
+        {
+          "time": "Chapecoense",
+          "eixo": "ofensivo",
+          "pos_antigo": 16,
+          "pos_novo": 9
+        },
+        {
+          "time": "Bahia",
+          "eixo": "ofensivo",
+          "pos_antigo": 2,
+          "pos_novo": 11
+        },
+        {
+          "time": "Bragantino",
+          "eixo": "ofensivo",
+          "pos_antigo": 7,
+          "pos_novo": 14
+        },
+        {
+          "time": "Cruzeiro",
+          "eixo": "ofensivo",
+          "pos_antigo": 11,
+          "pos_novo": 18
+        },
+        {
+          "time": "Sao Paulo",
+          "eixo": "defensivo",
+          "pos_antigo": 9,
+          "pos_novo": 4
+        },
+        {
+          "time": "Fluminense",
+          "eixo": "defensivo",
+          "pos_antigo": 14,
+          "pos_novo": 6
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "defensivo",
+          "pos_antigo": 18,
+          "pos_novo": 7
+        },
+        {
+          "time": "Palmeiras",
+          "eixo": "defensivo",
+          "pos_antigo": 2,
+          "pos_novo": 8
+        },
+        {
+          "time": "Flamengo",
+          "eixo": "defensivo",
+          "pos_antigo": 4,
+          "pos_novo": 10
+        },
+        {
+          "time": "Vasco",
+          "eixo": "defensivo",
+          "pos_antigo": 8,
+          "pos_novo": 15
+        },
+        {
+          "time": "Gremio",
+          "eixo": "defensivo",
+          "pos_antigo": 10,
+          "pos_novo": 16
+        }
+      ]
+    },
+    {
+      "rodada": 20,
+      "ofensivo_top3_novo": [
+        1,
+        3
+      ],
+      "ofensivo_top3_antigo": [
+        0,
+        3
+      ],
+      "ofensivo_top5_novo": [
+        1,
+        5
+      ],
+      "ofensivo_top5_antigo": [
+        0,
+        5
+      ],
+      "ofensivo_top6_novo": [
+        2,
+        6
+      ],
+      "ofensivo_top6_antigo": [
+        0,
+        6
+      ],
+      "defensivo_top3_novo": [
+        2,
+        3
+      ],
+      "defensivo_top3_antigo": [
+        1,
+        3
+      ],
+      "defensivo_top5_novo": [
+        2,
+        5
+      ],
+      "defensivo_top5_antigo": [
+        2,
+        5
+      ],
+      "defensivo_top6_novo": [
+        2,
+        6
+      ],
+      "defensivo_top6_antigo": [
+        2,
+        6
+      ],
+      "mudancas_grandes": [
+        {
+          "time": "Santos",
+          "eixo": "ofensivo",
+          "pos_antigo": 10,
+          "pos_novo": 3
+        },
+        {
+          "time": "Flamengo",
+          "eixo": "ofensivo",
+          "pos_antigo": 11,
+          "pos_novo": 5
+        },
+        {
+          "time": "Athletico PR",
+          "eixo": "ofensivo",
+          "pos_antigo": 15,
+          "pos_novo": 6
+        },
+        {
+          "time": "Gremio",
+          "eixo": "ofensivo",
+          "pos_antigo": 19,
+          "pos_novo": 8
+        },
+        {
+          "time": "Palmeiras",
+          "eixo": "ofensivo",
+          "pos_antigo": 20,
+          "pos_novo": 9
+        },
+        {
+          "time": "Remo",
+          "eixo": "ofensivo",
+          "pos_antigo": 16,
+          "pos_novo": 10
+        },
+        {
+          "time": "Fluminense",
+          "eixo": "ofensivo",
+          "pos_antigo": 3,
+          "pos_novo": 11
+        },
+        {
+          "time": "Mirassol",
+          "eixo": "ofensivo",
+          "pos_antigo": 9,
+          "pos_novo": 14
+        },
+        {
+          "time": "Botafogo",
+          "eixo": "ofensivo",
+          "pos_antigo": 5,
+          "pos_novo": 15
+        },
+        {
+          "time": "Internacional",
+          "eixo": "ofensivo",
+          "pos_antigo": 7,
+          "pos_novo": 18
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "ofensivo",
+          "pos_antigo": 13,
+          "pos_novo": 19
+        },
+        {
+          "time": "Palmeiras",
+          "eixo": "defensivo",
+          "pos_antigo": 7,
+          "pos_novo": 2
+        },
+        {
+          "time": "Flamengo",
+          "eixo": "defensivo",
+          "pos_antigo": 11,
+          "pos_novo": 5
+        },
+        {
+          "time": "Cruzeiro",
+          "eixo": "defensivo",
+          "pos_antigo": 14,
+          "pos_novo": 6
+        },
+        {
+          "time": "Vasco",
+          "eixo": "defensivo",
+          "pos_antigo": 15,
+          "pos_novo": 7
+        },
+        {
+          "time": "Remo",
+          "eixo": "defensivo",
+          "pos_antigo": 17,
+          "pos_novo": 9
+        },
+        {
+          "time": "Gremio",
+          "eixo": "defensivo",
+          "pos_antigo": 19,
+          "pos_novo": 10
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "defensivo",
+          "pos_antigo": 1,
+          "pos_novo": 12
+        },
+        {
+          "time": "Fluminense",
+          "eixo": "defensivo",
+          "pos_antigo": 3,
+          "pos_novo": 13
+        },
+        {
+          "time": "Internacional",
+          "eixo": "defensivo",
+          "pos_antigo": 4,
+          "pos_novo": 15
+        },
+        {
+          "time": "Corinthians",
+          "eixo": "defensivo",
+          "pos_antigo": 10,
+          "pos_novo": 16
+        },
+        {
+          "time": "Sao Paulo",
+          "eixo": "defensivo",
+          "pos_antigo": 8,
+          "pos_novo": 17
+        }
+      ]
+    },
+    {
+      "rodada": 21,
+      "ofensivo_top3_novo": [
+        1,
+        1
+      ],
+      "ofensivo_top3_antigo": [
+        0,
+        2
+      ],
+      "ofensivo_top5_novo": [
+        1,
+        2
+      ],
+      "ofensivo_top5_antigo": [
+        0,
+        2
+      ],
+      "ofensivo_top6_novo": [
+        1,
+        2
+      ],
+      "ofensivo_top6_antigo": [
+        1,
+        3
+      ],
+      "defensivo_top3_novo": [
+        2,
+        3
+      ],
+      "defensivo_top3_antigo": [
+        2,
+        3
+      ],
+      "defensivo_top5_novo": [
+        3,
+        5
+      ],
+      "defensivo_top5_antigo": [
+        3,
+        5
+      ],
+      "defensivo_top6_novo": [
+        4,
+        6
+      ],
+      "defensivo_top6_antigo": [
+        4,
+        6
+      ],
+      "mudancas_grandes": [
+        {
+          "time": "Botafogo",
+          "eixo": "ofensivo",
+          "pos_antigo": 8,
+          "pos_novo": 3
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "ofensivo",
+          "pos_antigo": 12,
+          "pos_novo": 5
+        },
+        {
+          "time": "Chapecoense",
+          "eixo": "ofensivo",
+          "pos_antigo": 13,
+          "pos_novo": 7
+        },
+        {
+          "time": "Cruzeiro",
+          "eixo": "ofensivo",
+          "pos_antigo": 3,
+          "pos_novo": 9
+        },
+        {
+          "time": "Santos",
+          "eixo": "ofensivo",
+          "pos_antigo": 1,
+          "pos_novo": 11
+        },
+        {
+          "time": "Bragantino",
+          "eixo": "ofensivo",
+          "pos_antigo": 4,
+          "pos_novo": 12
+        },
+        {
+          "time": "Bahia",
+          "eixo": "ofensivo",
+          "pos_antigo": 9,
+          "pos_novo": 18
+        },
+        {
+          "time": "Fluminense",
+          "eixo": "defensivo",
+          "pos_antigo": 11,
+          "pos_novo": 3
+        },
+        {
+          "time": "Palmeiras",
+          "eixo": "defensivo",
+          "pos_antigo": 1,
+          "pos_novo": 6
+        },
+        {
+          "time": "Atletico MG",
+          "eixo": "defensivo",
+          "pos_antigo": 15,
+          "pos_novo": 8
+        },
+        {
+          "time": "Sao Paulo",
+          "eixo": "defensivo",
+          "pos_antigo": 18,
+          "pos_novo": 10
+        },
+        {
+          "time": "Coritiba",
+          "eixo": "defensivo",
+          "pos_antigo": 19,
+          "pos_novo": 13
+        },
+        {
+          "time": "Vasco",
+          "eixo": "defensivo",
+          "pos_antigo": 9,
+          "pos_novo": 14
+        },
+        {
+          "time": "Bragantino",
+          "eixo": "defensivo",
+          "pos_antigo": 10,
+          "pos_novo": 16
+        },
+        {
+          "time": "Gremio",
+          "eixo": "defensivo",
+          "pos_antigo": 13,
+          "pos_novo": 18
+        }
+      ]
+    }
+  ]
+}

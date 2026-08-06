@@ -1,0 +1,46 @@
+ANÁLISE DA RODADA 21
+Recorte: últimos 3 jogos de cada time, no mesmo mando.
+
+============================================================
+MELHORES ATAQUES DA RODADA
+============================================================
+
+1º — SAO PAULO (casa) vs Santos
+Uma defesa do Santos que cedeu 43% de conversão fora de casa, mas o Sao Paulo soma 1,54 de xG em casa. É um dos cenários mais favoráveis da rodada para o ataque.
+
+2º — MIRASSOL (casa) vs Remo
+Com 1,22 de xG em casa, o Mirassol tem pela frente uma defesa do Remo que permitiu 6,2 chutes no alvo por jogo fora de casa. O confronto reforça o Mirassol entre os destaques ofensivos da rodada.
+
+3º — BOTAFOGO (casa) vs Gremio
+O Botafogo soma 1,73 de xG em casa, num confronto contra um Gremio que cedeu 21% de conversão fora de casa. Poucos confrontos são tão propícios para criar chances nesta rodada.
+
+4º — FLUMINENSE (casa) vs Bahia
+Produz 1,52 de xG em casa e encara um Bahia que sofreu 6 gols no recorte fora de casa. Poucos confrontos são tão propícios para criar chances nesta rodada.
+
+5º — ATLETICO MG (casa) vs Bragantino
+Com 1,46 de xG em casa, o Atletico MG tem pela frente uma defesa do Bragantino que permitiu 4,5 chutes no alvo por jogo fora de casa. É um dos cenários mais favoráveis da rodada para o ataque.
+
+6º — VASCO (fora) vs Chapecoense
+Diante de um Chapecoense que permitiu 4,6 chutes no alvo por jogo em casa, o Vasco chega com 0,98 de xG fora de casa. O confronto é equilibrado, sem favorito claro para nenhum dos lados.
+
+============================================================
+MELHORES DEFESAS DA RODADA
+============================================================
+
+1º — MIRASSOL (casa) vs Remo
+Diante de um Remo que vem criando bastante perigo fora de casa, o Mirassol chega com 0,77 de xG cedido em casa. O confronto reforça o Mirassol entre os destaques defensivos da rodada.
+
+2º — CORINTHIANS (casa) vs Athletico PR
+Um ataque do Athletico PR que vem criando bastante perigo fora de casa, mas o Corinthians soma 0,99 de xG cedido em casa. É um dos cenários mais seguros da rodada para não sofrer gol.
+
+3º — FLUMINENSE (casa) vs Bahia
+Com 1,14 de xG cedido em casa, o Fluminense tem pela frente um ataque do Bahia que converteu 38% dos chutes no alvo fora de casa. O confronto é equilibrado, sem garantia clara de SG.
+
+4º — VITORIA (casa) vs Palmeiras
+Com 0,94 de xG cedido em casa, o Vitoria tem pela frente um ataque do Palmeiras que balançou as redes com frequência fora de casa. Não há vantagem clara para nenhum dos lados aqui.
+
+5º — ATHLETICO PR (fora) vs Corinthians
+O Athletico PR soma 1,17 de xG cedido fora de casa, num confronto contra um Corinthians que marcou 7 gols no recorte em casa. Não há vantagem clara para nenhum dos lados aqui.
+
+6º — PALMEIRAS (fora) vs Vitoria
+O Palmeiras soma 0,95 de xG cedido fora de casa, num confronto contra um Vitoria que tem levado perigo com frequência em casa. Não há vantagem clara para nenhum dos lados aqui.

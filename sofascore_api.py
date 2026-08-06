@@ -327,8 +327,15 @@ def coletar_temporada(forcar: bool = False, progresso=None,
     sid = season_id or SEASON_ID
     arq = _arquivo_cache(sid)
 
+    # Carregado SEMPRE (mesmo com forcar=True) — é a rede de segurança contra
+    # falha de rede (ver abaixo). forcar só decide se as estatísticas de
+    # jogos JÁ salvos são reaproveitadas ou baixadas de novo; nunca decide se
+    # o fallback de emergência existe. Antes desta correção, forcar=True
+    # (usado por scripts/atualizar_rodada.py para forçar dados frescos)
+    # desligava as duas coisas juntas: se a rede falhasse no meio de uma
+    # atualização forçada, o cache bom era sobrescrito por uma lista vazia.
     antigos = {}
-    if arq.exists() and not forcar:
+    if arq.exists():
         try:
             antigos = {j["id"]: j for j in json.loads(arq.read_text("utf-8"))}
         except Exception:
@@ -345,15 +352,16 @@ def coletar_temporada(forcar: bool = False, progresso=None,
     jogos, baixados = [], 0
     pendentes = [e for e in eventos
                  if e.get("status", {}).get("type") == "finished"
-                 and e["id"] not in antigos]
+                 and (forcar or e["id"] not in antigos)]
     total = len(pendentes)
 
     for e in eventos:
         eid = e["id"]
         terminado = e.get("status", {}).get("type") == "finished"
 
-        # cache só é aproveitado se o jogo guardado já tem os campos novos
-        if terminado and eid in antigos and "home_xg_jogada" in antigos[eid]:
+        # cache só é aproveitado se o jogo guardado já tem os campos novos —
+        # e só quando forcar=False (forcar=True sempre baixa de novo).
+        if terminado and not forcar and eid in antigos and "home_xg_jogada" in antigos[eid]:
             jogos.append(antigos[eid])
             continue
         if not terminado:

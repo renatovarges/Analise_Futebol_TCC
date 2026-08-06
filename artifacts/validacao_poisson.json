@@ -1,0 +1,182 @@
+{
+  "gerado_em": "2026-08-06T21:56:21.271518+00:00",
+  "n_folds": 126,
+  "alvo_2mais_gols": {
+    "convencao": "ganho_brier = brier_baseline - brier_modelo (positivo = modelo melhor)",
+    "n_rodadas": 126,
+    "n_observacoes": 2470,
+    "brier_medio_baseline": 0.2224,
+    "brier_medio_poisson": 0.2215,
+    "ganho_brier_medio": 0.0009,
+    "ganho_brier_ic95": [
+      -0.0019,
+      0.0033
+    ],
+    "fracao_rodadas_poisson_melhor": 0.563,
+    "p_valor_unicaudal_bootstrap": 0.245,
+    "por_temporada": {
+      "2023": {
+        "n": 660,
+        "brier_baseline": 0.2221,
+        "brier_poisson": 0.2221,
+        "ganho_brier": 0.0
+      },
+      "2024": {
+        "n": 706,
+        "brier_baseline": 0.2222,
+        "brier_poisson": 0.2214,
+        "ganho_brier": 0.0007
+      },
+      "2025": {
+        "n": 694,
+        "brier_baseline": 0.2237,
+        "brier_poisson": 0.2206,
+        "ganho_brier": 0.0032
+      },
+      "2026": {
+        "n": 410,
+        "brier_baseline": 0.2266,
+        "brier_poisson": 0.2248,
+        "ganho_brier": 0.0018
+      }
+    },
+    "por_mando": {
+      "casa": {
+        "n": 1235,
+        "brier_baseline": 0.2452,
+        "brier_poisson": 0.2446,
+        "ganho_brier": 0.0006
+      },
+      "fora": {
+        "n": 1235,
+        "brier_baseline": 0.2014,
+        "brier_poisson": 0.1992,
+        "ganho_brier": 0.0022
+      }
+    },
+    "por_terco_temporada": {
+      "inicio": {
+        "n": 818,
+        "brier_baseline": 0.2161,
+        "brier_poisson": 0.2182,
+        "ganho_brier": -0.0021
+      },
+      "meio": {
+        "n": 840,
+        "brier_baseline": 0.2265,
+        "brier_poisson": 0.2244,
+        "ganho_brier": 0.0021
+      },
+      "fim": {
+        "n": 812,
+        "brier_baseline": 0.2273,
+        "brier_poisson": 0.2231,
+        "ganho_brier": 0.0042
+      }
+    },
+    "distribuicao_probabilidades_poisson": {
+      "min": 0.08,
+      "max": 0.6538,
+      "media": 0.3434,
+      "desvio_padrao": 0.0654,
+      "p10": 0.2671,
+      "p50": 0.3388,
+      "p90": 0.4275
+    },
+    "estabilidade_ranking": {
+      "n_pares_avaliados": 180,
+      "spearman_medio": 0.909,
+      "spearman_p10": 0.796,
+      "interpretacao": "correlação média entre o ranking original e o ranking obtido reamostrando o treino por temporada (bootstrap em blocos de rodada) — mede o quanto a ORDEM prevista depende de quais rodadas específicas entraram no treino"
+    }
+  },
+  "alvo_sg": {
+    "convencao": "ganho_brier = brier_baseline - brier_modelo (positivo = modelo melhor)",
+    "n_rodadas": 126,
+    "n_observacoes": 2470,
+    "brier_medio_baseline": 0.2021,
+    "brier_medio_poisson": 0.2008,
+    "ganho_brier_medio": 0.0014,
+    "ganho_brier_ic95": [
+      -0.0005,
+      0.0033
+    ],
+    "fracao_rodadas_poisson_melhor": 0.54,
+    "p_valor_unicaudal_bootstrap": 0.0805,
+    "por_temporada": {
+      "2023": {
+        "n": 660,
+        "brier_baseline": 0.2115,
+        "brier_poisson": 0.2109,
+        "ganho_brier": 0.0007
+      },
+      "2024": {
+        "n": 706,
+        "brier_baseline": 0.1944,
+        "brier_poisson": 0.1926,
+        "ganho_brier": 0.0018
+      },
+      "2025": {
+        "n": 694,
+        "brier_baseline": 0.2042,
+        "brier_poisson": 0.203,
+        "ganho_brier": 0.0012
+      },
+      "2026": {
+        "n": 410,
+        "brier_baseline": 0.1808,
+        "brier_poisson": 0.1785,
+        "ganho_brier": 0.0023
+      }
+    },
+    "por_mando": {
+      "casa": {
+        "n": 1235,
+        "brier_baseline": 0.2276,
+        "brier_poisson": 0.2243,
+        "ganho_brier": 0.0033
+      },
+      "fora": {
+        "n": 1235,
+        "brier_baseline": 0.1714,
+        "brier_poisson": 0.1718,
+        "ganho_brier": -0.0005
+      }
+    },
+    "por_terco_temporada": {
+      "inicio": {
+        "n": 818,
+        "brier_baseline": 0.2055,
+        "brier_poisson": 0.2035,
+        "ganho_brier": 0.002
+      },
+      "meio": {
+        "n": 840,
+        "brier_baseline": 0.1916,
+        "brier_poisson": 0.1919,
+        "ganho_brier": -0.0003
+      },
+      "fim": {
+        "n": 812,
+        "brier_baseline": 0.2016,
+        "brier_poisson": 0.199,
+        "ganho_brier": 0.0026
+      }
+    },
+    "distribuicao_probabilidades_poisson": {
+      "min": 0.1104,
+      "max": 0.6325,
+      "media": 0.3001,
+      "desvio_padrao": 0.0534,
+      "p10": 0.2341,
+      "p50": 0.3001,
+      "p90": 0.3637
+    },
+    "estabilidade_ranking": {
+      "n_pares_avaliados": 180,
+      "spearman_medio": 0.908,
+      "spearman_p10": 0.789,
+      "interpretacao": "correlação média entre o ranking original e o ranking obtido reamostrando o treino por temporada (bootstrap em blocos de rodada) — mede o quanto a ORDEM prevista depende de quais rodadas específicas entraram no treino"
+    }
+  }
+}

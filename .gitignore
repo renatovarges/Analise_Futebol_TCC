@@ -10,6 +10,10 @@ env/
 venv/
 .env
 
+# Artefatos derivados de modeling/ — reproduzíveis via scripts/build_dataset.py
+# a partir de .cache/*.json. Os resumos (JSON pequenos) continuam versionados.
+artifacts/*.parquet
+
 # App específico
 *.csv
 !PLANILHA PREENCHIMENTO DE XG E XGA oficial.xlsx

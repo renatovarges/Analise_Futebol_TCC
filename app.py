@@ -186,9 +186,15 @@ try:
     st.title(f"⚽ Análise xG/xGA — Rodada {rodada_sel}")
 
     filtro_label = "por mando" if tipo_filtro == "POR_MANDO" else "gerais"
-    st.caption(
-        f"Usando os **{n_jogos} últimos jogos {filtro_label}** de cada time  "
-        f"·  Dados: SofaScore (Brasileirão 2026)"
+    st.caption(f"Dados: SofaScore (Brasileirão 2026)")
+    st.info(
+        "🎯 **Ranking calculado pelo modelo preditivo** (probabilidade calibrada por "
+        "backtest em 4 temporadas). A tabela de análise abaixo mostra o **recorte "
+        f"descritivo** que você escolheu — **{n_jogos} últimos jogos {filtro_label}** — "
+        "que é diferente do que o modelo usa internamente (várias janelas combinadas). "
+        "Os dois são úteis: a tabela mostra a forma recente time a time; o ranking "
+        "decide quem entra nos destaques.",
+        icon="ℹ️",
     )
 
     # ── CONFRONTOS DA RODADA ──────────────────────────────────────────────
@@ -233,10 +239,11 @@ try:
     st.divider()
     st.header("🎯 Destaques da Rodada")
     st.caption(
-        "Ranking calculado cruzando os números do próprio time com os do adversário "
-        "no eixo oposto. Mandantes são comparados com mandantes e visitantes com "
-        "visitantes, para que um bom desempenho fora de casa não seja apagado pelo "
-        "viés de mando."
+        "Ranking calculado pelo modelo preditivo (regressão de Poisson, validada por "
+        "backtest em 4 temporadas — detalhes em docs/MODEL_CARD.md). **xG** é a "
+        "probabilidade de gol de cada finalização somada ao longo do jogo — quanto "
+        "maior, mais chances de qualidade o time produziu ou cedeu; **xGA** é o mesmo "
+        "número do ponto de vista de quem defende."
     )
 
     ROTULOS = {
@@ -298,11 +305,16 @@ try:
             f"<small>({d['mando']}) × {d['adversario']}</small>",
             unsafe_allow_html=True,
         )
-        st.caption(f"{badge} {d['veredito_texto']}  ·  índice {eixo} {d['indice']:+.2f}")
+        prob = d.get("probabilidade", d["indice"])
+        st.caption(
+            f"{badge} {d['veredito_texto']}  ·  **{prob:.0%}**  ·  "
+            f"{d.get('faixa_expectativa', '')}  ·  "
+            f"confiança {d.get('confianca_modelo', d['confianca']):.0%}"
+        )
 
-        # Por que este time está nesta posição — as três frentes da análise.
+        # Por que este time está nesta posição — os fatores de maior peso no modelo.
         if d.get("razoes"):
-            st.markdown("  ·  ".join(f"*{r}*" for r in d["razoes"][:3]))
+            st.markdown("  ·  ".join(f"*{r}*" for r in d["razoes"][:2]))
 
         # Parágrafo pronto para o Canva — st.code traz botão de cópia nativo.
         st.code(textos.get(chave, "—"), language=None, wrap_lines=True)
@@ -316,24 +328,20 @@ try:
         if d["confianca"] < 0.99:
             st.info(
                 f"ℹ️ Amostra incompleta: {d['proprio']['jogos']} jogo(s) no recorte. "
-                "O índice foi encolhido em direção à média da rodada."
+                "A probabilidade foi encolhida em direção à média da liga."
             )
 
         with st.expander("🔍 Números que sustentam a análise"):
             dec = d.get("decomposicao") or {}
             if dec:
-                st.markdown("**De onde vem o índice** — as três frentes somadas")
-                k1, k2, k3 = st.columns(3)
-                k1.metric("Desempenho próprio", f"{dec.get('proprio', 0):+.2f}")
-                k2.metric(
-                    "Fragilidade adversária" if d["eixo"] == "ofensivo"
-                    else "Fraqueza ofensiva adv.",
-                    f"{dec.get('adversario', 0):+.2f}",
+                st.markdown("**Fatores de maior peso na previsão do modelo**")
+                for campo, contrib in sorted(dec.items(), key=lambda kv: -abs(kv[1]))[:4]:
+                    st.markdown(f"- `{campo}`: {contrib:+.3f}")
+                st.caption(
+                    "Contribuição de cada variável para o log da taxa esperada de gols "
+                    "(regressão de Poisson) — positivo empurra a probabilidade para cima, "
+                    "negativo para baixo. Não é probabilidade em si, é peso relativo."
                 )
-                k3.metric("Potencialização mútua",
-                          f"{dec.get('potencializacao', 0):+.2f}",
-                          help="Bônus quando força própria e fraqueza do adversário "
-                               "apontam para o mesmo lado. Zero quando uma anula a outra.")
                 st.divider()
             c1, c2 = st.columns(2)
             with c1:
@@ -436,7 +444,8 @@ try:
                 st.markdown("**Ofensivo**")
                 st.dataframe(
                     [{"#": d["posicao"], "Time": d["time"], "Mando": d["mando"],
-                      "Adversário": d["adversario"], "Índice": d["indice"]}
+                      "Adversário": d["adversario"], "P(2+ gols)": f"{d['probabilidade']:.0%}",
+                      "Confiança": f"{d.get('confianca_modelo', d['confianca']):.0%}"}
                      for d in analise["todos_ofensivos"]],
                     width="stretch", hide_index=True,
                 )
@@ -444,7 +453,8 @@ try:
                 st.markdown("**Defensivo**")
                 st.dataframe(
                     [{"#": d["posicao"], "Time": d["time"], "Mando": d["mando"],
-                      "Adversário": d["adversario"], "Índice": d["indice"]}
+                      "Adversário": d["adversario"], "P(SG)": f"{d['probabilidade']:.0%}",
+                      "Confiança": f"{d.get('confianca_modelo', d['confianca']):.0%}"}
                      for d in analise["todos_defensivos"]],
                     width="stretch", hide_index=True,
                 )

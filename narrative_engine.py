@@ -25,28 +25,19 @@ import re
 # do material — vão para o prompt como referência de estilo, nunca de conteúdo.
 
 EXEMPLOS_REFERENCIA = [
-    "Apresenta um perfil defensivo consistente em casa, com 1,10 de XGA, apenas 2 gols "
-    "sofridos e 22% de conversão cedida. O Remo, entretanto, marcou 5 gols fora e "
-    "apresenta boa eficiência, tornando o SG possível, mas menos seguro do que os "
-    "números isolados do Mirassol sugerem.",
+    "Produz 1,54 de xG em casa e enfrenta um Santos que permitiu 4,8 chutes no alvo por "
+    "partida fora. O confronto mantém o São Paulo entre as melhores expectativas "
+    "ofensivas da rodada.",
 
-    "Os números defensivos do Palmeiras são bons, mas são desafiados pelos bons números "
-    "ofensivos do Vitória, que tem o maior número de gols marcados entre os mandantes "
-    "nos últimos três jogos.",
+    "A produção de 1,73 de xG em casa encontra uma defesa do Grêmio que vem permitindo "
+    "finalizações perigosas fora. O cenário ofensivo é favorável, embora sem margem "
+    "para tratar dois gols como certeza.",
 
-    "Sofreu apenas 1 gol e conquistou dois SGs nos últimos três jogos fora, permitindo "
-    "somente 9% de conversão aos adversários. O confronto, porém, é de alta exigência, "
-    "porque o Internacional marcou 7 gols e produziu pelo menos 1,46 de xG em todas as "
-    "partidas recentes em casa.",
+    "Cede 1,10 de xG por jogo em casa contra um Remo que marcou 5 gols no recorte. É um "
+    "dos cenários mais seguros da rodada para não sofrer gol.",
 
-    "Combina 1,71 de xG com 5 gols marcados e 42% de conversão em casa. O Bahia não "
-    "conquistou SG fora, sofreu 6 gols e cedeu 6,3 chutes no alvo por partida, formando "
-    "um cruzamento favorável ao ataque tricolor.",
-
-    "Apresenta um dos cruzamentos ofensivos mais completos da rodada. Produziu mais de "
-    "1,50 de xG em todos os jogos recentes em casa e enfrenta um Remo que cedeu mais de "
-    "1,70 de xG em todas as partidas fora, além de permitir 6,7 chutes no alvo por jogo "
-    "e não conquistar nenhum SG.",
+    "Diante de um Internacional que produziu 1,46 de xG em casa, o Bahia chega com 0,78 "
+    "de xG cedido fora. O ataque adversário, porém, impõe risco real a essa defesa.",
 ]
 
 INSTRUCOES = """Você é um analista de futebol especializado em Cartola FC. Escreve os \
@@ -54,57 +45,64 @@ parágrafos de destaque que acompanham a tabela de xG/xGA entregue a alunos de u
 de análise.
 
 TAREFA
-Para cada time do dossiê, escreva UM parágrafo de 2 a 3 frases explicando por que ele é \
-destaque da rodada no eixo indicado (ofensivo ou defensivo).
+Para cada time do dossiê, escreva UM parágrafo de EXATAMENTE 2 frases curtas explicando \
+por que ele é destaque da rodada no eixo indicado (ofensivo ou defensivo). Densidade e \
+naturalidade vêm antes de quantidade de dado — o parágrafo é para ouvir, não para ler \
+tabela em voz alta.
 
 REGRAS INEGOCIÁVEIS
 1. Use SOMENTE números presentes no dossiê daquele time. Não calcule, não arredonde, não \
    estime, não infira. Se um número não está no dossiê, ele não existe.
 2. Não invente contexto externo: nada de lesões, escalações, tabela, sequência de \
    vitórias, momento psicológico, técnico ou clássico. Só o que está no dossiê.
-3. Todo parágrafo cruza os dois lados: os números do próprio time E os números do \
-   adversário no eixo oposto. Um destaque ofensivo cita o ataque dele contra a defesa do \
-   adversário; um destaque defensivo cita a defesa dele contra o ataque do adversário. \
-   Nunca misture os eixos.
-4. CALIBRE A PROMESSA À CONFIABILIDADE DO EIXO. Isto não é estilo, é honestidade:
-   - Eixo DEFENSIVO (confiabilidade alta, validado em 10 rodadas): pode afirmar.
-     "cenário favorável ao SG", "defesa consistente", "poucas chances cedidas".
-   - Eixo OFENSIVO (confiabilidade baixa, diferença dentro da margem de erro):
-     NUNCA prometa gol. Fale de CENÁRIO e de CRIAÇÃO DE CHANCES, não de
-     resultado. Escreva "cruzamento favorável ao ataque", "cenário propício
-     para criar", "encontra uma defesa vulnerável" — e nunca "vai marcar",
-     "tende a balançar a rede" ou "gol provável".
+3. Um fator do PRÓPRIO time e um fator do ADVERSÁRIO no eixo oposto, sempre os dois. Um \
+   destaque ofensivo cita o ataque dele contra a defesa do adversário; um destaque \
+   defensivo cita a defesa dele contra o ataque do adversário. Nunca misture os eixos.
+4. NO MÁXIMO DUAS MÉTRICAS NUMÉRICAS NO TOTAL (uma do próprio time, uma do adversário — a \
+   do adversário é opcional; pode descrever a fraqueza/ameaça dele SEM número, de forma \
+   qualitativa, quando isso deixar a frase mais limpa). Nunca empilhe três ou mais \
+   números. Contagens pequenas soltas na prosa ("sofreu 3 gols", "não teve SG") não \
+   contam nessa conta — são fato corrido, não estatística.
+5. TAMANHO: entre 25 e 45 palavras no parágrafo inteiro. Curto e denso, não telegráfico \
+   nem prolixo.
+6. CALIBRE A PROMESSA À CONFIABILIDADE DO EIXO. Isto não é estilo, é honestidade — medido \
+   por backtest real (AUC≈0,60 nos dois eixos, vantagem sobre a taxa-base pequena):
+   - Eixo DEFENSIVO: pode falar em "cenário favorável para não sofrer gol", "boa \
+     expectativa de SG" — nunca "vai garantir o SG" ou "SG certo".
+   - Eixo OFENSIVO: NUNCA prometa gol. Fale de CENÁRIO e de PRODUÇÃO, não de resultado. \
+     Nunca "vai marcar", "tende a balançar a rede", "gol provável".
+7. NÃO EXPLIQUE O QUE É xG/xGA no parágrafo — a explicação já está na interface, uma vez \
+   só, fora do texto. Escreva só "1,71 de xG", sem parênteses explicando o termo.
+8. "SG" tem linguagem natural: "não sofrer gol", "ter SG", "boa expectativa de SG". \
+   NUNCA "conquistar SG" ou "conquistou SG" — soa a boletim, não a fala.
+9. O campo "veredito" define o tom do fechamento e é obrigatório respeitá-lo:
+   - MUITO_FAVORAVEL / FAVORAVEL → tom confirmatório, mas SEM as frases banidas abaixo.
+   - NEUTRO → tom neutro, sem promessa, confronto equilibrado.
+   - RESSALVA → uma ressalva curta e natural (não "entretanto, tornando o cenário possível \
+     mas menos seguro" — isso é longo demais; algo como "ainda assim, o adversário tem \
+     números que pedem cautela").
+   - ALTA_EXIGENCIA → deixe claro que o adversário impõe dificuldade real, em poucas palavras.
+10. PROIBIDO, em qualquer frase: "vale destacar", "é importante ressaltar", "é válido \
+    mencionar", "nesse contexto"/"neste contexto", "diante desse cenário", "surge como", \
+    "se apresenta como", "desponta", "vem demonstrando", "potencializa", "fator \
+    determinante", "não apenas", "não é apenas", "compondo um cenário propício", \
+    "apresenta um dos cruzamentos [...] mais completos", "formando um cruzamento \
+    [...] mais favorável" e qualquer variação genérica que sirva para qualquer time.
+11. Escreva em português do Brasil. Decimais com vírgula (1,71 e não 1.71).
+12. Não abra o parágrafo com o nome do próprio time em destaque — ele já aparece no \
+    card. Comece pelo verbo, pelo número ou por "Diante de"/"Com"/"Contra".
+13. Varie a estrutura entre os parágrafos — se dois times da mesma rodada abrirem com a \
+    mesma construção, um controle automático detecta e substitui o parágrafo. Alterne \
+    ordem (próprio primeiro vs. adversário primeiro), verbo de abertura e conector.
+14. Sem títulos, sem marcadores, sem emoji, sem aspas. Só o parágrafo corrido.
 
-5. EXPLIQUE O JARGÃO NA PRIMEIRA VEZ que usar, de forma curta e natural.
-   "1,71 de xG (o equivalente a criar quase dois gols em chances claras)".
-   Prefira "chances claras", "finalizações de dentro da área", "toques na área"
-   a siglas. Use xGA no máximo uma vez por parágrafo, sempre com contexto.
-
-6. NO MÁXIMO DOIS NÚMEROS POR FRASE. O material vira áudio, e quem ouve não
-   retém três números seguidos. Se tiver três fatos, quebre em duas frases.
-
-7. QUANDO O DOSSIÊ TROUXER, use o material que explica o COMO, não só o quanto:
-   - "perigo_bola_parada_pct" alto: o time depende de bola parada
-   - "perigo_contra_ataque_pct" alto: cria em transição
-   - "sofre_bola_parada_pct" alto no adversário: vulnerabilidade explorável
-   - "gols_evitados_goleiro" positivo: o goleiro está segurando acima do normal
-     (atenção: isso pode estar mascarando uma defesa pior do que parece)
-   Isso é o que diferencia análise de leitura de tabela.
-
-8. O campo "veredito" define o tom do fechamento e é obrigatório respeitá-lo:
-   - cruzamento muito favorável / favorável → tom confirmatório ("formando um cruzamento \
-     favorável", "cenário claramente propício")
-   - cruzamento equilibrado → tom neutro, sem promessa
-   - bons números próprios, mas com ressalva → use adversativa ("entretanto", "porém") e \
-     deixe claro que o confronto reduz a segurança dos números isolados
-   - confronto de alta exigência → deixe explícito que o adversário impõe dificuldade real
-9. Escreva em português do Brasil. Decimais com vírgula (1,71 e não 1.71).
-10. Não abra o parágrafo com o nome do próprio time em destaque — ele já aparece no \
-    card. Comece pelo verbo ou pelo perfil ("Combina...", "Apresenta...", "Sofreu...").
-11. Varie a estrutura entre os parágrafos. Se todos abrirem igual, o material denuncia \
-    automação. Alterne: perfil primeiro e veredito no fim; veredito primeiro e números \
-    depois; consistência da série antes das médias.
-12. Sem títulos, sem marcadores, sem emoji, sem aspas. Só o parágrafo corrido.
+15. Além do parágrafo, declare em "fatos_usados" QUAIS campos do dossiê você usou e de
+    QUE LADO cada um veio: "sujeito":"proprio" para números do dicionário "numeros_proprios"
+    do time analisado, "sujeito":"adversario" para números de "numeros_adversario". Declare
+    só os campos cujo VALOR realmente aparece escrito no parágrafo. Um validador automático
+    confere cada declaração contra o dossiê, o tamanho, a contagem de números e as frases
+    banidas — falha em qualquer checagem derruba o parágrafo e ele é substituído por um
+    parágrafo determinístico.
 
 VOCABULÁRIO DO DOSSIÊ
 - xg_medio / xga_medio: média por jogo no recorte
@@ -124,8 +122,12 @@ rodada e não devem ser reaproveitados):
 """ + "\n\n".join(f"— {e}" for e in EXEMPLOS_REFERENCIA) + """
 
 SAÍDA
-Responda em JSON: {"paragrafos": [{"chave": "<chave do dossiê>", "texto": "<parágrafo>"}]}
-Um item por time do dossiê, na mesma ordem."""
+Responda em JSON:
+{"paragrafos": [{"chave": "<chave do dossiê>", "texto": "<parágrafo>",
+                 "fatos_usados": [{"campo": "<chave em numeros_proprios ou numeros_adversario>",
+                                    "sujeito": "proprio ou adversario"}]}]}
+Um item por time do dossiê, na mesma ordem. "fatos_usados" precisa ter pelo menos um
+item "proprio" e um "adversario" — é a prova de que o parágrafo cruzou os dois lados."""
 
 
 # ---------------------------------------------------------------------------
@@ -174,18 +176,26 @@ _NUM_RE = re.compile(r"\d+(?:[.,]\d+)?")
 
 
 def _formas_aceitas(valor) -> set[str]:
-    """Todas as grafias plausíveis de um valor numérico do dossiê."""
+    """
+    Todas as grafias plausíveis de um valor numérico do dossiê.
+
+    Inclui o valor absoluto: "gols_evitados_goleiro" negativo vira, na
+    prosa, "0,51 gol por jogo ABAIXO do esperado" — o sinal já está na
+    palavra "abaixo", repetir o "-" seria estranho. Sem isso, todo número
+    negativo do dossiê disparava alerta de "sem origem" por engano.
+    """
     formas = set()
     try:
         v = float(valor)
     except (TypeError, ValueError):
         return formas
-    if v == int(v):
-        formas.add(str(int(v)))
-    for casas in (0, 1, 2):
-        s = f"{v:.{casas}f}"
-        formas.add(s)
-        formas.add(s.replace(".", ","))
+    for candidato in (v, abs(v)):
+        if candidato == int(candidato):
+            formas.add(str(int(candidato)))
+        for casas in (0, 1, 2):
+            s = f"{candidato:.{casas}f}"
+            formas.add(s)
+            formas.add(s.replace(".", ","))
     return formas
 
 
@@ -242,14 +252,16 @@ def verificar_numeros(texto: str, dossie: dict) -> list[str]:
 
 # ---------------------------------------------------------------------------
 # ENGINE PYTHON (sem API)
+#
+# Reescrito em 2026-08-06 para o padrão compacto: no máximo duas métricas
+# numéricas no total (uma do próprio time, uma opcional do adversário), no
+# máximo duas frases curtas, 25-45 palavras. A explicação de "o que é xG"
+# sai daqui — fica uma vez só na interface (app.py), não repetida em cada
+# parágrafo. "Conquistar SG" vira "ter SG" / "não sofrer gol".
 # ---------------------------------------------------------------------------
 
 def _n(v: float, casas: int = 2) -> str:
     return f"{v:.{casas}f}".replace(".", ",")
-
-
-_POR_EXTENSO = {1: "um", 2: "dois", 3: "três", 4: "quatro", 5: "cinco",
-                6: "seis", 7: "sete", 8: "oito", 9: "nove", 10: "dez"}
 
 
 def _mando(m: str) -> str:
@@ -257,252 +269,181 @@ def _mando(m: str) -> str:
     return "em casa" if m == "casa" else "fora de casa"
 
 
-def _gols(n: int) -> str:
-    return f"{n} gol" if n == 1 else f"{n} gols"
-
-
-def _gols_part(n: int, radical: str) -> str:
-    """Concorda o particípio com o número: '1 gol marcado' / '5 gols marcados'."""
-    return f"{n} gol {radical}o" if n == 1 else f"{n} gols {radical}os"
-
-
 def _maiuscula(s: str) -> str:
     return s[0].upper() + s[1:] if s else s
 
 
-# Os fragmentos vêm em duas naturezas, e misturá-las quebra a frase:
-#   nominais — sintagmas que podem ser enfileirados ("1,71 de xG", "5 gols")
-#   clausais — orações com verbo próprio, que exigem frase inteira
-#              ("produziu mais de 1,50 de xG em todos os jogos")
-
-def _perfil_ofensivo(f: dict) -> tuple[list[str], list[str]]:
-    # Território primeiro: finalização de dentro da área e toque na área foram
-    # os melhores preditores no backtest, e são mais concretos que sigla.
-    nom = []
-    if f.get("chutes_area"):
-        nom.append(f"{_n(f['chutes_area'], 1)} finalizações de dentro da área por jogo")
-    nom.append(f"{_n(f['xg_medio'])} de xG (o perigo criado por jogo)")
-    if f.get("chutes_alvo"):
-        nom.append(f"{_n(f['chutes_alvo'], 1)} chutes no alvo por jogo")
-    if f.get("gols"):
-        nom.append(_gols_part(f["gols"], "marcad"))
-    if f.get("conversao"):
-        nom.append(f"{f['conversao']}% de conversão")
-
-    cla = []
-    if f.get("xg_piso_todos"):
-        cla.append(f"criou mais de {_n(f['xg_piso_todos'])} de xG "
-                   f"em todos os jogos do recorte")
-    if f.get("marcou_em_todos"):
-        cla.append("marcou em todas as partidas do recorte")
-    if (f.get("perigo_bola_parada_pct") or 0) >= 35:
-        cla.append(f"tira {f['perigo_bola_parada_pct']}% do perigo que cria "
-                   f"de bola parada")
-    if (f.get("perigo_contra_ataque_pct") or 0) >= 25:
-        cla.append(f"cria {f['perigo_contra_ataque_pct']}% do perigo em "
-                   f"contra-ataque")
-    return nom, cla
-
-
-def _perfil_defensivo(f: dict) -> tuple[list[str], list[str]]:
-    gs = f.get("gols_sofridos", 0)
-    sofridos = _gols_part(gs, "sofrid")
-    nom = [f"{_n(f['xga_medio'])} de xGA",
-           f"apenas {sofridos}" if gs <= 2 else sofridos]
-    cs = f.get("clean_sheets", 0)
-    if cs:
-        plural = "s" if cs > 1 else ""
-        nom.append(f"{_POR_EXTENSO.get(cs, cs)} SG{plural} conquistado{plural}")
-    if f.get("conversao_cedida"):
-        nom.append(f"{f['conversao_cedida']}% de conversão cedida")
-    if f.get("chutes_alvo_cedidos"):
-        nom.append(f"{_n(f['chutes_alvo_cedidos'], 1)} chutes no alvo cedidos por partida")
-
-    cla = []
-    if f.get("xga_teto_todos"):
-        cla.append(f"não cedeu mais de {_n(f['xga_teto_todos'])} de xG em nenhum jogo")
-    if f.get("nao_sofreu_em_nenhum"):
-        cla.append("não sofreu gol em nenhuma das partidas do recorte")
-    if (f.get("sofre_bola_parada_pct") or 0) >= 35:
-        cla.append(f"leva {f['sofre_bola_parada_pct']}% do perigo que sofre "
-                   f"em bola parada")
-    if (f.get("sofre_contra_ataque_pct") or 0) >= 25:
-        cla.append(f"sofre {f['sofre_contra_ataque_pct']}% do perigo em transição")
-    ge = f.get("gols_evitados_goleiro")
-    if ge and ge >= 0.25:
-        cla.append(f"tem sido segurado pelo goleiro, que evita {_n(ge)} gol "
-                   f"por jogo acima do esperado")
-    elif ge and ge <= -0.25:
-        cla.append(f"vem sendo prejudicado pelo goleiro, {_n(abs(ge))} gol por "
-                   f"jogo abaixo do esperado")
-    return nom, cla
-
-
-def _fragilidades_defensivas(f: dict) -> list[str]:
-    """Orações sobre a defesa adversária — o que a torna vulnerável."""
-    frs = []
-    if f.get("xga_piso_todos"):
-        frs.append(f"cedeu mais de {_n(f['xga_piso_todos'])} de xG em todas as partidas")
-    if f.get("clean_sheets", 0) == 0:
-        frs.append("não conquistou nenhum SG")
-    if f.get("gols_sofridos"):
-        frs.append(f"sofreu {_gols(f['gols_sofridos'])}")
-    if f.get("chutes_alvo_cedidos"):
-        frs.append(f"permitiu {_n(f['chutes_alvo_cedidos'], 1)} chutes no alvo por jogo")
-    if f.get("conversao_cedida"):
-        frs.append(f"viu os adversários converterem {f['conversao_cedida']}% das finalizações")
-    return frs
-
-
-def _ameacas_ofensivas(f: dict) -> list[str]:
-    """Orações sobre o ataque adversário — o que o torna perigoso."""
-    frs = []
-    if f.get("xg_piso_todos"):
-        frs.append(f"produziu pelo menos {_n(f['xg_piso_todos'])} de xG em todos os jogos")
-    if f.get("gols"):
-        frs.append(f"marcou {_gols(f['gols'])}")
-    if f.get("conversao"):
-        frs.append(f"converteu {f['conversao']}% dos chutes no alvo")
-    if f.get("chutes_alvo"):
-        frs.append(f"finalizou {_n(f['chutes_alvo'], 1)} vezes no alvo por partida")
-    return frs
-
-
-def _juntar(frs: list[str]) -> str:
-    if not frs:
-        return ""
-    if len(frs) == 1:
-        return frs[0]
-    return ", ".join(frs[:-1]) + " e " + frs[-1]
-
-
-_ABERTURAS_OF = [
-    "Combina {frs} {mando}.",
-    "Produz {frs} nos últimos jogos {mando}.",
-    "Chega à rodada com {frs} {mando}.",
-    "Reúne {frs} atuando {mando}.",
-    "Sustenta {frs} no recorte {mando}.",
+# ── Abertura: o único número do PRÓPRIO time ────────────────────────────────
+_ABERTURAS_PROPRIO_OF = [
+    "Produz {xg} de xG {mando}",
+    "Chega com {xg} de xG {mando}",
+    "Vem de {xg} de xG por jogo {mando}",
+    "A produção de {xg} de xG {mando}",
+    "Soma {xg} de xG {mando}",
 ]
-_ABERTURAS_DEF = [
-    "Apresenta um perfil defensivo consistente {mando}, com {frs}.",
-    "Registra {frs} {mando}.",
-    "Vem de {frs} atuando {mando}.",
-    "Mantém {frs} no recorte {mando}.",
-    "Soma {frs} {mando}.",
-]
-# Quando existe fato de consistência, ele abre o parágrafo — é a construção
-# mais forte, e é a que o analista usa nos exemplos de referência.
-_ABERTURAS_CONSISTENCIA = [
-    "{cla} {mando}, somando {frs}.",
-    "{cla} {mando}. Soma ainda {frs}.",
-    "{cla} {mando}, com {frs}.",
-]
-_ABERTURA_TOPO_OF = [
-    "Apresenta um dos cruzamentos ofensivos mais completos da rodada.",
-    "É um dos cruzamentos ofensivos mais completos entre os destaques da rodada.",
-]
-_ABERTURA_TOPO_DEF = [
-    "Apresenta um dos cruzamentos defensivos mais seguros da rodada.",
-    "É um dos cenários defensivos mais favoráveis entre os destaques da rodada.",
+_ABERTURAS_PROPRIO_DEF = [
+    "Cede {xga} de xG por jogo {mando}",
+    "Tem cedido {xga} de xG {mando}",
+    "Segura a defesa em {xga} de xG cedido {mando}",
+    "Vem permitindo {xga} de xG {mando}",
+    "Mantém {xga} de xG cedido {mando}",
 ]
 
-# Fechos separados por eixo. O defensivo pode afirmar — foi validado em 10
-# rodadas (SG em 37% contra 17%). O ofensivo fala de CENÁRIO e de CRIAÇÃO,
-# nunca de gol: a diferença medida ficou dentro da margem de erro, e prometer
-# gol seria vender o que o modelo não entrega.
+_CONECTORES = ["e enfrenta", "contra", "diante de", "e encara"]
+_CONECTORES_ENCONTRA = ["encontra", "esbarra em", "tem pela frente"]
+
+
+def _fator_adversario_of(adv_f: dict, rng: random.Random) -> str | None:
+    """Uma fraqueza defensiva do adversário — com número, ou não (metade das vezes)."""
+    numericos = []
+    if adv_f.get("chutes_alvo_cedidos"):
+        numericos.append(f"que permitiu {_n(adv_f['chutes_alvo_cedidos'], 1)} chutes no alvo por jogo")
+    if adv_f.get("conversao_cedida"):
+        numericos.append(f"que cedeu {adv_f['conversao_cedida']}% de conversão")
+    if adv_f.get("gols_sofridos"):
+        numericos.append(f"que sofreu {adv_f['gols_sofridos']} gols no recorte")
+    qualitativos = [
+        "que vem sofrendo bastante", "que tem cedido espaço no último terço",
+        "que tem levado sustos na defesa", "que ainda não achou solidez atrás",
+    ]
+    if adv_f.get("clean_sheets", 0) == 0:
+        qualitativos.append("que não teve nenhum SG recente")
+    if numericos and (not qualitativos or rng.random() < 0.5):
+        return rng.choice(numericos)
+    return rng.choice(qualitativos)
+
+
+def _fator_adversario_def(adv_f: dict, rng: random.Random) -> str | None:
+    """Uma ameaça ofensiva do adversário — com número, ou não (metade das vezes)."""
+    numericos = []
+    if adv_f.get("conversao"):
+        numericos.append(f"que converteu {adv_f['conversao']}% dos chutes no alvo")
+    if adv_f.get("chutes_alvo"):
+        numericos.append(f"que finalizou {_n(adv_f['chutes_alvo'], 1)} vezes no alvo por jogo")
+    if adv_f.get("gols"):
+        numericos.append(f"que marcou {adv_f['gols']} gols no recorte")
+    qualitativos = [
+        "que vem criando bastante perigo", "que tem sido eficiente na conclusão",
+        "que chega embalado ofensivamente", "que tem levado perigo com frequência",
+    ]
+    if adv_f.get("gols", 0) >= 4:
+        qualitativos.append("que balançou as redes com frequência")
+    if numericos and (not qualitativos or rng.random() < 0.5):
+        return rng.choice(numericos)
+    return rng.choice(qualitativos)
+
+
+# ── Fecho: sem número, tom preso ao veredito, sem clichê ────────────────────
 _FECHOS_OF = {
     "MUITO_FAVORAVEL": [
-        "formando um dos cruzamentos ofensivos mais favoráveis da rodada.",
-        "compondo um cenário propício para criar chances.",
+        "É um dos cenários mais favoráveis da rodada para o ataque.",
+        "Poucos confrontos são tão propícios para criar chances nesta rodada.",
+        "O confronto reforça o {time} entre os destaques ofensivos da rodada.",
     ],
     "FAVORAVEL": [
-        "formando um cruzamento favorável ao ataque.",
-        "o que desenha um cenário propício para criar.",
+        "O confronto mantém o {time} entre as boas expectativas ofensivas da rodada.",
+        "O cenário ofensivo pesa a favor, mas dois gols não são certeza.",
+        "É um dos cenários mais interessantes para o ataque nesta rodada.",
     ],
     "NEUTRO": [
-        "o que mantém o confronto equilibrado.",
-        "deixando o cenário em aberto.",
+        "O confronto é equilibrado, sem favorito claro para nenhum dos lados.",
+        "Não há vantagem clara para nenhum dos lados aqui.",
+    ],
+    "RESSALVA": [
+        "Ainda assim, o adversário tem números que pedem cautela.",
+        "O cenário é positivo, mas o adversário reduz essa segurança.",
+    ],
+    "ALTA_EXIGENCIA": [
+        "O adversário, porém, impõe um teste real para esse ataque.",
+        "É um confronto de alta exigência para criar chances aqui.",
     ],
 }
 _FECHOS_DEF = {
     "MUITO_FAVORAVEL": [
-        "formando um cenário claramente favorável ao SG.",
-        "compondo um dos quadros defensivos mais seguros da rodada.",
+        "É um dos cenários mais seguros da rodada para não sofrer gol.",
+        "Poucos confrontos favorecem tanto o SG nesta rodada.",
+        "O confronto reforça o {time} entre os destaques defensivos da rodada.",
     ],
     "FAVORAVEL": [
-        "formando um cenário favorável ao SG.",
-        "o que desenha um quadro defensivo propício.",
+        "O cenário defensivo favorece o {time} na busca pelo SG.",
+        "É um cenário favorável, embora sem garantia de SG.",
+        "O confronto mantém o {time} entre as boas expectativas defensivas da rodada.",
     ],
     "NEUTRO": [
-        "o que mantém o confronto equilibrado.",
-        "deixando o cenário em aberto.",
+        "O confronto é equilibrado, sem garantia clara de SG.",
+        "Não há vantagem clara para nenhum dos lados aqui.",
+    ],
+    "RESSALVA": [
+        "Ainda assim, o ataque adversário tem números que pedem atenção.",
+        "O cenário é positivo, mas o adversário reduz essa segurança.",
+    ],
+    "ALTA_EXIGENCIA": [
+        "O ataque adversário, porém, impõe risco real a essa defesa.",
+        "É um confronto de alta exigência para manter o SG aqui.",
     ],
 }
 
 
 def _redigir_python(dossies: list[dict]) -> dict[str, str]:
-    """Redação local, sem API. Determinística e auditável linha a linha."""
+    """
+    Redação local, sem API. Determinística e auditável linha a linha.
+
+    Estrutura fixa: frase 1 funde o único número do próprio time com um
+    fator do adversário (numérico ou não — nunca os dois numéricos fazem o
+    texto passar de duas métricas); frase 2 fecha o tom conforme o veredito,
+    sem repetir número nenhum.
+    """
     saida = {}
     for d in dossies:
         rng = random.Random(f"{d['time']}|{d['eixo']}|{d['posicao']}")
         ofensivo = d["eixo"] == "ofensivo"
         prop, adv_f = d["proprio"], d["adversario_fatos"]
-        adv, ver = d["adversario"], d["veredito"]
+        adv, ver, time = d["adversario"], d["veredito"], d["time"]
         mando_prop, mando_adv = _mando(prop["mando"]), _mando(adv_f["mando"])
 
-        nominais, clausais = (_perfil_ofensivo(prop) if ofensivo
-                              else _perfil_defensivo(prop))
-        contra = (_fragilidades_defensivas(adv_f) if ofensivo
-                  else _ameacas_ofensivas(adv_f))
-        sup = [s["texto"] for s in d["superlativos"]]
-        sup_adv = [s["texto"] for s in d["superlativos_adversario"]]
+        # ── Frase 1 — próprio + adversário, no máximo 2 números ────────────
+        # 4 esqueletos genuinamente diferentes (não só troca de verbo dentro
+        # do mesmo molde) — precisa disso porque o controle de repetição
+        # compara a frase com números e nomes mascarados: dois textos que só
+        # trocam o verbo de abertura ficam com o MESMO esqueleto mascarado e
+        # colidem sempre. Achado real ao testar a rodada 20 (2026-08-06):
+        # similaridade de até 1,00 entre times diferentes com só 2 moldes.
+        fator_adv = (_fator_adversario_of(adv_f, rng) if ofensivo
+                     else _fator_adversario_def(adv_f, rng))
+        xg_ou_xga = _n(prop["xg_medio"] if ofensivo else prop["xga_medio"])
+        verbo_proprio = "de xG" if ofensivo else "de xG cedido"
+        artigo_defesa = "uma defesa do" if ofensivo else "um ataque do"
 
-        # ── Abertura ───────────────────────────────────────────────────────
-        topo = d["posicao"] <= 2 and ver in ("MUITO_FAVORAVEL", "FAVORAVEL")
-        if topo:
-            base = _ABERTURA_TOPO_OF if ofensivo else _ABERTURA_TOPO_DEF
-            verbo = "Produz" if ofensivo else "Registra"
-            f1 = (f"{rng.choice(base)} {verbo} "
-                  f"{_juntar(nominais[:3])} {mando_prop}.")
-        elif clausais and rng.random() < 0.7:
-            f1 = rng.choice(_ABERTURAS_CONSISTENCIA).format(
-                cla=_maiuscula(clausais[0]), mando=mando_prop,
-                frs=_juntar(nominais[:2]),
-            )
+        # Nota: fator_adv sempre começa com "que ..." (oração relativa) — só
+        # pode ser encaixado depois de um substantivo (adv sozinho, ou
+        # artigo_defesa+adv). Um esqueleto anterior colocava "que..." direto
+        # após o nome do time sem verbo principal na oração — quebrava a
+        # gramática (regressão pega ao testar a rodada 20, corrigida aqui).
+        esqueleto = rng.randrange(5)
+        if esqueleto == 0:
+            abertura = rng.choice(_ABERTURAS_PROPRIO_OF if ofensivo else _ABERTURAS_PROPRIO_DEF)
+            abertura = abertura.format(xg=xg_ou_xga, xga=xg_ou_xga, mando=mando_prop)
+            conector = rng.choice(_CONECTORES)
+            f1 = f"{abertura} {conector} um {adv} {fator_adv} {mando_adv}."
+        elif esqueleto == 1:
+            f1 = (f"{_maiuscula(artigo_defesa)} {adv} {fator_adv} {mando_adv}, mas o {time} "
+                  f"soma {xg_ou_xga} {verbo_proprio} {mando_prop}.")
+        elif esqueleto == 2:
+            f1 = (f"Diante de um {adv} {fator_adv} {mando_adv}, o {time} chega com "
+                  f"{xg_ou_xga} {verbo_proprio} {mando_prop}.")
+        elif esqueleto == 3:
+            f1 = (f"Com {xg_ou_xga} {verbo_proprio} {mando_prop}, o {time} "
+                  f"{rng.choice(_CONECTORES_ENCONTRA)} {artigo_defesa} {adv} "
+                  f"{fator_adv} {mando_adv}.")
         else:
-            moldes = _ABERTURAS_OF if ofensivo else _ABERTURAS_DEF
-            f1 = rng.choice(moldes).format(
-                frs=_juntar(nominais[:3]), mando=mando_prop
-            )
+            f1 = (f"O {time} soma {xg_ou_xga} {verbo_proprio} {mando_prop}, num confronto "
+                  f"contra um {adv} {fator_adv} {mando_adv}.")
+        f1 = _maiuscula(f1)
 
-        # O superlativo vira oração própria — pendurado por vírgula, parece
-        # estar descrevendo o número anterior. No topo o parágrafo já tem
-        # frases suficientes, então é omitido.
-        if sup and not topo:
-            # Evita repetir o verbo que já abriu o parágrafo.
-            opcoes = [f"Tem ainda {sup[0]}.", f"Registra também {sup[0]}.",
-                      f"É ainda o time com {sup[0]}."]
-            primeiro = f1.split(maxsplit=1)[0].rstrip(".,")
-            opcoes = [o for o in opcoes if not o.startswith(primeiro)] or opcoes
-            f1 += " " + rng.choice(opcoes)
-
-        # ── Cruzamento ─────────────────────────────────────────────────────
-        trecho = _juntar(contra[:3])
-        if sup_adv and rng.random() < 0.6:
-            extra = f"tem {sup_adv[0]}"
-            trecho = f"{trecho}, e {extra}" if trecho else extra
-
-        if ver == "ALTA_EXIGENCIA":
-            f2 = (f"O confronto, porém, é de alta exigência: o {adv} {trecho} "
-                  f"{mando_adv}.")
-        elif ver == "RESSALVA":
-            alvo = "o cenário ofensivo" if ofensivo else "o SG"
-            f2 = (f"O {adv}, entretanto, {trecho} {mando_adv}, tornando {alvo} "
-                  f"possível, mas menos seguro do que os números isolados sugerem.")
-        else:
-            banco = _FECHOS_OF if ofensivo else _FECHOS_DEF
-            fecho = rng.choice(banco.get(ver, banco["NEUTRO"]))
-            f2 = f"O {adv} {trecho} {mando_adv}, {fecho}"
+        # ── Frase 2 — fecho por veredito, sem número ────────────────────────
+        banco = _FECHOS_OF if ofensivo else _FECHOS_DEF
+        fecho = rng.choice(banco.get(ver, banco["NEUTRO"]))
+        f2 = fecho.format(time=time)
 
         saida[chave_dossie(d)] = f"{f1} {f2}"
     return saida
@@ -522,8 +463,20 @@ _SCHEMA = {
                 "properties": {
                     "chave": {"type": "string"},
                     "texto": {"type": "string"},
+                    "fatos_usados": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "campo": {"type": "string"},
+                                "sujeito": {"type": "string", "enum": ["proprio", "adversario"]},
+                            },
+                            "required": ["campo", "sujeito"],
+                            "additionalProperties": False,
+                        },
+                    },
                 },
-                "required": ["chave", "texto"],
+                "required": ["chave", "texto", "fatos_usados"],
                 "additionalProperties": False,
             },
         }
@@ -550,14 +503,16 @@ def _prompt_usuario(payload: list[dict], analise: dict) -> str:
     )
 
 
-def _parse(bruto: str) -> dict[str, str]:
+def _parse(bruto: str) -> tuple[dict[str, str], dict[str, list[dict]]]:
     """Extrai o JSON da resposta, tolerando cercas de código."""
     txt = bruto.strip()
     if txt.startswith("```"):
         txt = re.sub(r"^```(?:json)?\s*", "", txt)
         txt = re.sub(r"\s*```$", "", txt)
     dados = json.loads(txt)
-    return {p["chave"]: p["texto"].strip() for p in dados["paragrafos"]}
+    textos = {p["chave"]: p["texto"].strip() for p in dados["paragrafos"]}
+    fatos = {p["chave"]: p.get("fatos_usados", []) for p in dados["paragrafos"]}
+    return textos, fatos
 
 
 def _e_incompativel_com_chat(e: Exception) -> bool:
@@ -586,7 +541,7 @@ def _texto_da_resposta(r) -> str:
     return "".join(partes)
 
 
-def _redigir_openai(payload, analise, api_key, modelo, timeout: float) -> dict[str, str]:
+def _redigir_openai(payload, analise, api_key, modelo, timeout: float) -> tuple[dict[str, str], dict[str, list]]:
     from openai import OpenAI
 
     # max_retries=0 é essencial: o padrão do SDK é 2, então uma requisição
@@ -623,7 +578,7 @@ def _redigir_openai(payload, analise, api_key, modelo, timeout: float) -> dict[s
     return _parse(_texto_da_resposta(r))
 
 
-def _redigir_claude(payload, analise, api_key, modelo, timeout: float) -> dict[str, str]:
+def _redigir_claude(payload, analise, api_key, modelo, timeout: float) -> tuple[dict[str, str], dict[str, list]]:
     import anthropic
 
     client = anthropic.Anthropic(api_key=api_key, timeout=timeout, max_retries=0)
@@ -708,31 +663,64 @@ def gerar_paragrafos(
     """
     Redige os parágrafos dos destaques da rodada.
 
+    Cada parágrafo de IA é validado individualmente (atribuição completa,
+    tom vs veredito, frases banidas — narratives/phrase_validator.py) e,
+    fora do padrão, substituído SÓ NAQUELE ITEM pelo motor Python — não
+    descarta a rodada inteira por causa de um parágrafo problemático.
+    Depois disso, um controle de repetição (narratives/repetition_control.py)
+    passa pela rodada inteira na ordem do ranking e tenta re-substituir por
+    Python qualquer parágrafo de IA estruturalmente repetido.
+
     Retorna:
         {
           "textos":     {chave: parágrafo},
-          "alertas":    {chave: [números sem origem no dossiê]},
+          "alertas":    {chave: [números sem origem no dossiê]},        # checagem antiga, mantida
+          "problemas_ia": {chave: [motivos da substituição, se houve]},  # novo
+          "repeticoes":  {chave: [avisos de repetição não resolvidos]},  # novo
+          "fontes":      {chave: "ia" | "python (fallback item)" | "python"},
           "provedor_usado": str,
-          "segundos":   float,        # quanto durou a geração
-          "erro":       str | None,   # preenchido quando houve queda para o fallback
+          "segundos":   float,
+          "erro":       str | None,
         }
     """
     import time
+
+    from narratives.phrase_validator import validar_paragrafo_ia, validar_paragrafo_fallback
+    from narratives.repetition_control import ControleRepeticao
 
     dossies = analise["ranking_ofensivo"] + analise["ranking_defensivo"]
     payload = montar_payload(analise)
     erro = None
     usado = provedor
     t0 = time.monotonic()
+    problemas_ia: dict[str, list[str]] = {}
+    fontes: dict[str, str] = {}
 
     if provedor in ("openai", "claude") and api_key:
         fn = _redigir_openai if provedor == "openai" else _redigir_claude
         alvo = modelo or MODELOS_PADRAO[provedor]
         try:
-            textos = fn(payload, analise, api_key, alvo, timeout)
+            textos, fatos = fn(payload, analise, api_key, alvo, timeout)
             faltando = [chave_dossie(d) for d in dossies if not textos.get(chave_dossie(d))]
             if faltando:
                 raise ValueError(f"resposta incompleta: {len(faltando)} parágrafo(s)")
+
+            precisam_fallback = []
+            for d in dossies:
+                k = chave_dossie(d)
+                probs = validar_paragrafo_ia(textos[k], fatos.get(k, []), d)
+                if probs:
+                    problemas_ia[k] = probs
+                    precisam_fallback.append(d)
+                else:
+                    fontes[k] = "ia"
+
+            if precisam_fallback:
+                substitutos = _redigir_python(precisam_fallback)
+                for d in precisam_fallback:
+                    k = chave_dossie(d)
+                    textos[k] = substitutos[k]
+                    fontes[k] = "python (fallback item)"
         except Exception as e:
             gasto = time.monotonic() - t0
             if "timeout" in type(e).__name__.lower() or "timed out" in str(e).lower():
@@ -743,17 +731,49 @@ def gerar_paragrafos(
                 erro = f"[modelo: {alvo}] {type(e).__name__}: {e}"
             textos = _redigir_python(dossies)
             usado = "python (fallback)"
+            fontes = {chave_dossie(d): "python (fallback)" for d in dossies}
     else:
         if provedor in ("openai", "claude"):
             erro = "Chave de API não informada."
             usado = "python (fallback)"
         textos = _redigir_python(dossies)
+        fontes = {chave_dossie(d): "python" for d in dossies}
+
+    # controle de repetição: passa pela rodada inteira, na ordem do ranking,
+    # e tenta trocar por Python qualquer item de IA que colidiu com um
+    # anterior. Itens já vindos do Python só são reportados — recair no
+    # mesmo motor não resolveria a colisão.
+    controle = ControleRepeticao()
+    repeticoes: dict[str, list[str]] = {}
+    for d in dossies:
+        k = chave_dossie(d)
+        texto = textos.get(k, "")
+        probs = controle.checar(k, texto, d["time"], d["adversario"])
+        if probs and fontes.get(k) == "ia":
+            substituto = _redigir_python([d])[k]
+            probs_novo = controle.checar(k, substituto, d["time"], d["adversario"])
+            textos[k] = substituto
+            fontes[k] = "python (fallback repetição)"
+            if probs_novo:
+                repeticoes[k] = probs_novo
+        elif probs:
+            repeticoes[k] = probs
+        controle.registrar(k, textos[k], d["time"], d["adversario"])
+
+    # frases banidas / tom-vs-veredito, aplicado a TODO texto final,
+    # independente da origem — rede de segurança final.
+    for d in dossies:
+        k = chave_dossie(d)
+        extra = validar_paragrafo_fallback(textos[k], d)
+        if extra:
+            problemas_ia.setdefault(k, []).extend(extra)
 
     alertas = {
         chave_dossie(d): verificar_numeros(textos.get(chave_dossie(d), ""), d)
         for d in dossies
     }
-    return {"textos": textos, "alertas": alertas, "provedor_usado": usado,
+    return {"textos": textos, "alertas": alertas, "problemas_ia": problemas_ia,
+            "repeticoes": repeticoes, "fontes": fontes, "provedor_usado": usado,
             "segundos": round(time.monotonic() - t0, 1), "erro": erro}
 
 

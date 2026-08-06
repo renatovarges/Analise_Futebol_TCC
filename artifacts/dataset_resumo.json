@@ -1,0 +1,48 @@
+{
+  "linhas_totais": 2530,
+  "colunas_totais": 235,
+  "temporadas": [
+    "2023",
+    "2024",
+    "2025",
+    "2026"
+  ],
+  "linhas_por_temporada": {
+    "2023": 720,
+    "2024": 706,
+    "2025": 694,
+    "2026": 410
+  },
+  "taxa_alvo_2mais_gols": 0.3538,
+  "taxa_alvo_sg": 0.2818,
+  "qualidade_por_temporada": {
+    "2023": {
+      "total_partidas": 360,
+      "partidas_completas": 360,
+      "partidas_invalidas_schema": 0,
+      "ids_duplicados": 0,
+      "partidas_remarcadas": 8
+    },
+    "2024": {
+      "total_partidas": 360,
+      "partidas_completas": 353,
+      "partidas_invalidas_schema": 0,
+      "ids_duplicados": 0,
+      "partidas_remarcadas": 16
+    },
+    "2025": {
+      "total_partidas": 360,
+      "partidas_completas": 347,
+      "partidas_invalidas_schema": 0,
+      "ids_duplicados": 0,
+      "partidas_remarcadas": 18
+    },
+    "2026": {
+      "total_partidas": 384,
+      "partidas_completas": 205,
+      "partidas_invalidas_schema": 0,
+      "ids_duplicados": 0,
+      "partidas_remarcadas": 4
+    }
+  }
+}
