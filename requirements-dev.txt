@@ -1,0 +1,10 @@
+# Dependências de TREINAMENTO/BACKTEST — não usadas pelo app.py em produção.
+#
+# O Streamlit Cloud já teve histórico de crash por memória (ver commits
+# "Corrigir crash de memoria"). scikit-learn + scipy são pesados (~45MB) e só
+# rodam nos scripts em scripts/ e nos módulos em modeling/, executados
+# localmente para treinar e validar os modelos. A inferência em produção usa
+# só os coeficientes já treinados (numpy puro), não estas libs.
+-r requirements.txt
+scikit-learn==1.9.0
+scipy==1.18.0

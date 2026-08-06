@@ -21,7 +21,7 @@ from statistics import mean
 
 import pandas as pd
 
-from modeling.shrinkage import K_PROVISORIO, encolher_em_cadeia
+from modeling.shrinkage import K_VALIDADO, encolher_em_cadeia
 
 JANELAS = (3, 5, 10)
 EWMA_ALPHA = 0.30
@@ -193,13 +193,12 @@ def _linha_features(
     return linha
 
 
-def construir_dataset(jogos: list[dict], k: float = K_PROVISORIO, temporada: str | None = None) -> pd.DataFrame:
+def construir_dataset(jogos: list[dict], k: float = K_VALIDADO, temporada: str | None = None) -> pd.DataFrame:
     """
     Monta o dataset longitudinal equipe-partida de uma temporada.
 
-    k usa o provisório (modeling/shrinkage.K_PROVISORIO) até o backtest
-    (scripts/run_backtest.py) validar o valor final — ver docstring de
-    shrinkage.py. Repetir esta chamada com outro k depois de validado.
+    k=2.0 por padrão (modeling/shrinkage.K_VALIDADO) — validado por grade de
+    busca no backtest walk-forward, ver docstring de shrinkage.py.
     """
     por_time = construir_eventos(jogos)
     todos_eventos = [e for lst in por_time.values() for e in lst]
