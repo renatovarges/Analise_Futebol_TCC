@@ -217,6 +217,41 @@ def construir_dataset(jogos: list[dict], k: float = K_VALIDADO, temporada: str |
     return df
 
 
+def features_confronto_futuro(
+    mandante: str, visitante: str, rodada_num: int, date_unix: int, partida_id: int,
+    por_time: dict[str, list[Evento]], todos_eventos: list[Evento], k: float = K_VALIDADO,
+) -> dict[str, dict]:
+    """
+    Mesma conta de _linha_features, para uma partida que AINDA NÃO ACONTECEU.
+
+    O alvo é um Evento sem resultado (gols=None) — só existe para carregar
+    date_unix/mando/adversário, que é o que define o corte de histórico.
+    Reaproveita literalmente a mesma função usada para montar o dataset de
+    treino, então não existe caminho de código separado entre "como o
+    modelo foi treinado" e "como o modelo é usado" — o motivo mais comum de
+    dessincronia entre o que a interface promete e o que o modelo calcula
+    (seção 10).
+    """
+    alvo_mandante = Evento(
+        partida_id=partida_id, time=mandante, adversario=visitante,
+        mando="casa", game_week=rodada_num, date_unix=date_unix,
+    )
+    alvo_visitante = Evento(
+        partida_id=partida_id, time=visitante, adversario=mandante,
+        mando="fora", game_week=rodada_num, date_unix=date_unix,
+    )
+
+    linha_m = _linha_features(mandante, alvo_mandante, por_time.get(mandante, []), todos_eventos, k)
+    linha_v = _linha_features(visitante, alvo_visitante, por_time.get(visitante, []), todos_eventos, k)
+
+    campos_join = [c for c in linha_m if c.endswith(("_j3", "_j5", "_j10", "_temporada", "_ewma"))]
+    for c in campos_join:
+        linha_m[f"adv_{c}"] = linha_v[c]
+        linha_v[f"adv_{c}"] = linha_m[c]
+
+    return {"mandante": linha_m, "visitante": linha_v}
+
+
 def forca_adversario(df: pd.DataFrame) -> pd.DataFrame:
     """
     Anexa a cada linha a força do ADVERSÁRIO na mesma partida, lendo as
