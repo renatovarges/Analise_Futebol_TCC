@@ -1,7 +1,7 @@
 {
   "versao_modelo": "poisson-v1",
   "versao_dataset": "v1",
-  "treinado_em": "2026-08-06T21:31:33.375342+00:00",
+  "treinado_em": "2026-08-06T22:08:47.094448+00:00",
   "ultima_partida_usada_unix": 1785457800,
   "ultima_partida_usada_data": "2026-07-31",
   "linhas_treino": 2530,

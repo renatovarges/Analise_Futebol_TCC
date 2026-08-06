@@ -116,7 +116,13 @@ _LINGUAGEM_PROMESSA_GOL = (
 )
 
 _LINGUAGEM_CONFIRMATORIA = (
-    "favorável", "propício", "consistente", "seguro", "sólido", "confortável",
+    # radicais, não a palavra inteira: "favor" pega favorável/favoráveis/
+    # favorito, "propici" pega propício/propícia, etc. — o motor compacto de
+    # 2026-08-06 usa mais variação de flexão (plural, feminino) do que o
+    # banco antigo previa, e checar só a forma singular masculina deixava
+    # passar falso-negativo (frase correta, marcada como sem tom confirmatório).
+    "favor", "propici", "consistent", "segur", "sólid", "solid", "confortáv",
+    "reforça", "entre os destaques", "entre as boas expectativas",
 )
 
 _LINGUAGEM_RESSALVA = ("porém", "entretanto", "contudo", "no entanto", "apesar")
@@ -169,12 +175,62 @@ FRASES_BANIDAS = (
     "surge como", "se apresenta como", "desponta", "vem demonstrando",
     "potencializa ainda mais", "potencializa", "pode ser um fator determinante",
     "fator determinante", "não apenas", "não é apenas",
+    # banidas na revisão de 2026-08-06 — viraram muleta genérica, repetida
+    # em quase todo parágrafo do motor antigo, e servem pra qualquer time:
+    "compondo um cenário propício", "cenário propício para criar",
+    "conquistou sg", "conquistar sg", "conquistou nenhum sg",
+)
+
+# "apresenta um dos cruzamentos [ofensivos/defensivos] mais completos/favoráveis
+# da rodada" — o clichê específico é sobre CRUZAMENTOS (a palavra do motor
+# antigo), não sobre "cenário" — "um dos cenários mais favoráveis" é uma frase
+# nova, legítima, do banco de fechos atual, e não pode cair nesta regra (achado
+# ao rodar a suíte: a regex anterior incluía "cenário" e se autobloqueava).
+_PADRAO_CRUZAMENTO_CLICHE = re.compile(
+    r"(apresenta|é|forma(ndo)?)\s+um\s+dos\s+cruzamentos\s+"
+    r"(ofensivos|defensivos)?\s*mais\s+(completos?|favor[aá]veis?)",
+    re.IGNORECASE,
 )
 
 
 def checar_frases_banidas(texto: str) -> list[str]:
     baixo = texto.lower()
-    return [f for f in FRASES_BANIDAS if f in baixo]
+    achadas = [f for f in FRASES_BANIDAS if f in baixo]
+    if _PADRAO_CRUZAMENTO_CLICHE.search(texto):
+        achadas.append("apresenta um dos cruzamentos [...] mais completos (clichê genérico)")
+    return achadas
+
+
+# ---------------------------------------------------------------------------
+# TAMANHO E DENSIDADE (seção 2 da revisão de 2026-08-06)
+# ---------------------------------------------------------------------------
+
+MIN_PALAVRAS, MAX_PALAVRAS = 20, 55   # janela com folga sobre o alvo de 25-45
+MAX_METRICAS_NUMERICAS = 2
+_INTEIROS_LIVRES_DENSIDADE = set(range(0, 12))
+
+
+def checar_tamanho(texto: str) -> list[str]:
+    n = len(texto.split())
+    if n < MIN_PALAVRAS:
+        return [f"parágrafo muito curto ({n} palavras, mínimo {MIN_PALAVRAS})"]
+    if n > MAX_PALAVRAS:
+        return [f"parágrafo muito longo ({n} palavras, máximo {MAX_PALAVRAS})"]
+    return []
+
+
+def checar_densidade_numerica(texto: str) -> list[str]:
+    """Conta só números que parecem estatística (decimais e percentuais) — contagens
+    pequenas soltas (0-11) são fato corrido, não "métrica", e não entram na conta."""
+    achados = _NUM_RE.findall(texto)
+    metricas = [
+        a for a in achados
+        if "," in a or "." in a or "%" in texto[texto.find(a):texto.find(a) + len(a) + 1]
+        or float(a.replace(",", ".")) >= 12
+    ]
+    if len(metricas) > MAX_METRICAS_NUMERICAS:
+        return [f"{len(metricas)} métricas numéricas no texto (máximo {MAX_METRICAS_NUMERICAS}): {metricas}"]
+    return []
 
 
 # ---------------------------------------------------------------------------
@@ -187,15 +243,19 @@ def validar_paragrafo_ia(texto: str, fatos_usados: list[dict], dossie: dict) -> 
     problemas += checar_numeros_no_texto(texto, autorizados, dossie)
     problemas += checar_tom_veredito(texto, dossie.get("eixo", ""), dossie.get("veredito", ""))
     problemas += [f"frase banida: {p!r}" for p in checar_frases_banidas(texto)]
+    problemas += checar_tamanho(texto)
+    problemas += checar_densidade_numerica(texto)
     return problemas
 
 
 def validar_paragrafo_fallback(texto: str, dossie: dict) -> list[str]:
     """
     O motor Python é correto por construção quanto a ATRIBUIÇÃO (ver docstring
-    do módulo) — aqui só checa tom/veredito e frases banidas, que são
-    propriedades de REDAÇÃO, não de origem do dado.
+    do módulo) — aqui checa tom/veredito, frases banidas, tamanho e densidade
+    numérica, que são propriedades de REDAÇÃO, não de origem do dado.
     """
     problemas = checar_tom_veredito(texto, dossie.get("eixo", ""), dossie.get("veredito", ""))
     problemas += [f"frase banida: {p!r}" for p in checar_frases_banidas(texto)]
+    problemas += checar_tamanho(texto)
+    problemas += checar_densidade_numerica(texto)
     return problemas

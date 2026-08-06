@@ -70,7 +70,7 @@ Walk-forward real: 126 folds, cada um treinado só com dados de data anterior à
 |---|---|---|
 | Brier Score | 0,2219 | 0,1981 |
 | ROC AUC | 0,599 | 0,614 |
-| Diferença de Brier vs. baseline | +0,0009 (IC95 inclui zero) | +0,0014 (IC95 inclui zero) |
+| Ganho de Brier vs. baseline (baseline−modelo; positivo=modelo melhor) | +0,0009 (IC95 inclui zero) | +0,0014 (IC95 inclui zero) |
 | Lift top 3 sobre a taxa-base da rodada | +13,3pp | +11,4pp |
 | Estabilidade do ranking (Spearman sob reamostragem) | 0,909 | 0,908 |
 

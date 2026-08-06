@@ -4,9 +4,22 @@ scripts/validar_poisson.py — a vantagem do Poisson sobre a baseline é real ou
 
 Diferente de run_backtest.py (que avalia cada candidato separadamente), este
 script compara Poisson E baseline NAS MESMAS rodadas, par a par, e bootstrapa
-a DIFERENÇA — não duas médias soltas. Isso responde a pergunta certa: "nesta
+o GANHO — não duas médias soltas. Isso responde a pergunta certa: "nesta
 mesma rodada, o Poisson errou menos que a baseline, ou foi só sorte de
 amostra".
+
+CONVENÇÃO DE SINAL (única, usada em todo o projeto — scripts, artifacts/*.json,
+docs/BACKTEST.md, docs/MODEL_CARD.md):
+
+    ganho_brier = brier_baseline − brier_modelo
+
+    positivo → o modelo (Poisson) errou MENOS que a baseline (modelo melhor)
+    negativo → a baseline errou MENOS que o modelo (baseline melhor)
+    zero     → empate
+
+Brier Score é erro (menor é melhor), então "ganho" tem que ser
+"o que eu tirei de erro" = erro_de_quem_eu_comparo − erro_do_modelo. Testado
+em tests/test_brier_convention.py.
 
 Uso:
     python scripts/validar_poisson.py
@@ -41,7 +54,7 @@ def _brier_por_rodada(y_real: np.ndarray, y_prob: np.ndarray) -> float:
     return float(np.mean((y_prob - y_real) ** 2))
 
 
-def diferenca_pareada(df: pd.DataFrame, alvo: str, folds) -> dict:
+def ganho_brier_pareado(df: pd.DataFrame, alvo: str, folds) -> dict:
     cand = candidatos_para(alvo)
     baseline_spec, poisson_spec = cand["baseline_liga_mando"], cand["poisson"]
 
@@ -58,18 +71,18 @@ def diferenca_pareada(df: pd.DataFrame, alvo: str, folds) -> dict:
             "temporada": fold.temporada, "rodada": fold.rodada, "date_min": fold.date_min,
             "n": len(y_real),
             "brier_baseline": brier_base, "brier_poisson": brier_pois,
-            "diferenca": brier_base - brier_pois,   # positivo = poisson melhor
+            "ganho_brier": brier_base - brier_pois,   # positivo = poisson melhor (ver docstring do módulo)
             "y_real": y_real, "p_base": p_base, "p_pois": p_pois,
             "mando": df_teste["mando"].to_numpy(), "time": df_teste["time"].to_numpy(),
             "game_week": df_teste["game_week"].to_numpy(),
         })
 
-    diffs = np.array([l["diferenca"] for l in linhas])
+    ganhos = np.array([l["ganho_brier"] for l in linhas])
     rng = np.random.default_rng(42)
-    n = len(diffs)
-    boot = np.array([diffs[rng.integers(0, n, size=n)].mean() for _ in range(2000)])
+    n = len(ganhos)
+    boot = np.array([ganhos[rng.integers(0, n, size=n)].mean() for _ in range(2000)])
     ic_lo, ic_hi = np.percentile(boot, [2.5, 97.5])
-    p_valor_unicaudal = float(np.mean(boot <= 0))   # fração de replicações em que poisson NÃO venceria
+    p_valor_unicaudal = float(np.mean(boot <= 0))   # fração de replicações em que o Poisson NÃO venceria
 
     # desempenho por terço da temporada (posição relativa dentro de cada temporada)
     por_temporada_rodadas = {}
@@ -97,7 +110,7 @@ def diferenca_pareada(df: pd.DataFrame, alvo: str, folds) -> dict:
                 "n": int(len(yb)),
                 "brier_baseline": round(_brier_por_rodada(yb, pb), 4),
                 "brier_poisson": round(_brier_por_rodada(yb, pp), 4),
-                "diferenca": round(_brier_por_rodada(yb, pb) - _brier_por_rodada(yb, pp), 4),
+                "ganho_brier": round(_brier_por_rodada(yb, pb) - _brier_por_rodada(yb, pp), 4),
             }
         return saida
 
@@ -119,7 +132,7 @@ def diferenca_pareada(df: pd.DataFrame, alvo: str, folds) -> dict:
             "n": int(len(y)),
             "brier_baseline": round(_brier_por_rodada(y, pb), 4),
             "brier_poisson": round(_brier_por_rodada(y, pp), 4),
-            "diferenca": round(_brier_por_rodada(y, pb) - _brier_por_rodada(y, pp), 4),
+            "ganho_brier": round(_brier_por_rodada(y, pb) - _brier_por_rodada(y, pp), 4),
         }
 
     por_terco = _agrupar(lambda l: terco_de[(l["temporada"], l["rodada"])])
@@ -135,12 +148,13 @@ def diferenca_pareada(df: pd.DataFrame, alvo: str, folds) -> dict:
     }
 
     return {
+        "convencao": "ganho_brier = brier_baseline - brier_modelo (positivo = modelo melhor)",
         "n_rodadas": len(linhas), "n_observacoes": int(sum(l["n"] for l in linhas)),
         "brier_medio_baseline": round(float(np.mean([l["brier_baseline"] for l in linhas])), 4),
         "brier_medio_poisson": round(float(np.mean([l["brier_poisson"] for l in linhas])), 4),
-        "diferenca_media_brier": round(float(diffs.mean()), 4),
-        "diferenca_ic95": [round(float(ic_lo), 4), round(float(ic_hi), 4)],
-        "fracao_rodadas_poisson_melhor": round(float(np.mean(diffs > 0)), 3),
+        "ganho_brier_medio": round(float(ganhos.mean()), 4),
+        "ganho_brier_ic95": [round(float(ic_lo), 4), round(float(ic_hi), 4)],
+        "fracao_rodadas_poisson_melhor": round(float(np.mean(ganhos > 0)), 3),
         "p_valor_unicaudal_bootstrap": round(p_valor_unicaudal, 4),
         "por_temporada": por_temporada,
         "por_mando": por_mando_final,
@@ -208,12 +222,12 @@ def main() -> None:
     saida = {"gerado_em": pd.Timestamp.utcnow().isoformat(), "n_folds": len(folds)}
     for alvo in ALVOS:
         print(f"=== {alvo} ===")
-        r = diferenca_pareada(df, alvo, folds)
+        r = ganho_brier_pareado(df, alvo, folds)
         linhas_raw = r.pop("_linhas_para_estabilidade")
         print(f"  brier baseline={r['brier_medio_baseline']}  poisson={r['brier_medio_poisson']}  "
-              f"diff={r['diferenca_media_brier']}  IC95={r['diferenca_ic95']}  "
+              f"ganho_brier={r['ganho_brier_medio']}  IC95={r['ganho_brier_ic95']}  "
               f"poisson melhor em {r['fracao_rodadas_poisson_melhor']:.0%} das rodadas  "
-              f"p(diff<=0)={r['p_valor_unicaudal_bootstrap']}")
+              f"p(ganho<=0)={r['p_valor_unicaudal_bootstrap']}")
 
         est = estabilidade_ranking(df, alvo, folds)
         print(f"  estabilidade do ranking (spearman médio): {est['spearman_medio']}")

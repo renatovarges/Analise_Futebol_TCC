@@ -32,9 +32,17 @@ Nenhum número aqui foi estimado manualmente.
 
 ## 2. A vantagem do Poisson é real ou é ruído? (comparação pareada)
 
-`baseline` e `poisson` avaliados **nas mesmas rodadas**, diferença de Brier calculada rodada a rodada, IC 95% por bootstrap (2000 replicações) **agrupado por rodada** — reamostra rodadas inteiras, não observações soltas.
+`baseline` e `poisson` avaliados **nas mesmas rodadas**, IC 95% por bootstrap (2000 replicações) **agrupado por rodada** — reamostra rodadas inteiras, não observações soltas.
 
-| Alvo | Brier baseline | Brier Poisson | Diferença média | IC 95% da diferença | % rodadas Poisson melhor |
+**Convenção de sinal usada em todo este documento, em `MODEL_CARD.md` e nos artefatos JSON:**
+
+```
+ganho_brier = brier_baseline − brier_modelo
+```
+
+Brier Score é erro (menor = melhor), então **positivo = o modelo errou menos que a baseline (modelo melhor)**; negativo = baseline melhor; zero = empate. Testado em `tests/test_brier_convention.py`.
+
+| Alvo | Brier baseline | Brier Poisson | Ganho de Brier (baseline−modelo) | IC 95% do ganho | % rodadas Poisson melhor |
 |---|---|---|---|---|---|
 | 2+ gols | 0,2224 | 0,2215 | +0,0009 | **[-0,0019 ; 0,0033]** | 56% |
 | SG | 0,2021 | 0,2008 | +0,0014 | **[-0,0005 ; 0,0033]** | 54% |
@@ -54,7 +62,7 @@ Mesmo com calibração média não-significativa, escolher os times mais bem col
 
 **2+ gols** (Brier, baseline vs. Poisson, pareado):
 
-| Temporada | n | Brier baseline | Brier Poisson | Diferença |
+| Temporada | n | Brier baseline | Brier Poisson | Ganho de Brier (baseline−modelo) |
 |---|---|---|---|---|
 | 2023 | 660 | 0,2221 | 0,2221 | 0,0000 |
 | 2024 | 706 | 0,2222 | 0,2214 | +0,0007 |
@@ -63,7 +71,7 @@ Mesmo com calibração média não-significativa, escolher os times mais bem col
 
 **SG** (Brier, baseline vs. Poisson, pareado):
 
-| Temporada | n | Brier baseline | Brier Poisson | Diferença |
+| Temporada | n | Brier baseline | Brier Poisson | Ganho de Brier (baseline−modelo) |
 |---|---|---|---|---|
 | 2023 | 660 | 0,2115 | 0,2109 | +0,0007 |
 | 2024 | 706 | 0,1944 | 0,1926 | +0,0018 |
@@ -85,14 +93,14 @@ Times mandantes marcam 2+ gols quase 15 pontos percentuais mais que visitantes �
 
 ## 6. Desempenho por início/meio/fim de temporada
 
-| Alvo | Período | n | Diferença Poisson−baseline |
+| Alvo | Período | n | Ganho de Brier (baseline−modelo) |
 |---|---|---|---|
 | 2+ gols | início | 818 | **-0,0021** (baseline levemente melhor) |
-| 2+ gols | meio | 840 | +0,0021 |
-| 2+ gols | fim | 812 | +0,0042 |
-| SG | início | 818 | +0,0020 |
-| SG | meio | 840 | -0,0003 |
-| SG | fim | 812 | +0,0026 |
+| 2+ gols | meio | 840 | +0,0021 (Poisson melhor) |
+| 2+ gols | fim | 812 | +0,0042 (Poisson melhor) |
+| SG | início | 818 | +0,0020 (Poisson melhor) |
+| SG | meio | 840 | -0,0003 (baseline levemente melhor) |
+| SG | fim | 812 | +0,0026 (Poisson melhor) |
 
 Achado honesto: no início de temporada, o Poisson **não supera** a baseline no alvo ofensivo — faz sentido, já que o shrinkage puxa fortemente para a média da liga quando há pouco histórico, deixando o Poisson próximo da própria baseline nesse regime. A vantagem cresce ao longo da temporada, quando há mais sinal real disponível.
 

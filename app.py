@@ -239,10 +239,11 @@ try:
     st.divider()
     st.header("🎯 Destaques da Rodada")
     st.caption(
-        "Ranking calculado cruzando os números do próprio time com os do adversário "
-        "no eixo oposto. Mandantes são comparados com mandantes e visitantes com "
-        "visitantes, para que um bom desempenho fora de casa não seja apagado pelo "
-        "viés de mando."
+        "Ranking calculado pelo modelo preditivo (regressão de Poisson, validada por "
+        "backtest em 4 temporadas — detalhes em docs/MODEL_CARD.md). **xG** é a "
+        "probabilidade de gol de cada finalização somada ao longo do jogo — quanto "
+        "maior, mais chances de qualidade o time produziu ou cedeu; **xGA** é o mesmo "
+        "número do ponto de vista de quem defende."
     )
 
     ROTULOS = {

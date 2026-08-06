@@ -1,13 +1,14 @@
 {
-  "gerado_em": "2026-08-06T21:10:10.447255+00:00",
+  "gerado_em": "2026-08-06T21:56:21.271518+00:00",
   "n_folds": 126,
   "alvo_2mais_gols": {
+    "convencao": "ganho_brier = brier_baseline - brier_modelo (positivo = modelo melhor)",
     "n_rodadas": 126,
     "n_observacoes": 2470,
     "brier_medio_baseline": 0.2224,
     "brier_medio_poisson": 0.2215,
-    "diferenca_media_brier": 0.0009,
-    "diferenca_ic95": [
+    "ganho_brier_medio": 0.0009,
+    "ganho_brier_ic95": [
       -0.0019,
       0.0033
     ],
@@ -18,25 +19,25 @@
         "n": 660,
         "brier_baseline": 0.2221,
         "brier_poisson": 0.2221,
-        "diferenca": 0.0
+        "ganho_brier": 0.0
       },
       "2024": {
         "n": 706,
         "brier_baseline": 0.2222,
         "brier_poisson": 0.2214,
-        "diferenca": 0.0007
+        "ganho_brier": 0.0007
       },
       "2025": {
         "n": 694,
         "brier_baseline": 0.2237,
         "brier_poisson": 0.2206,
-        "diferenca": 0.0032
+        "ganho_brier": 0.0032
       },
       "2026": {
         "n": 410,
         "brier_baseline": 0.2266,
         "brier_poisson": 0.2248,
-        "diferenca": 0.0018
+        "ganho_brier": 0.0018
       }
     },
     "por_mando": {
@@ -44,13 +45,13 @@
         "n": 1235,
         "brier_baseline": 0.2452,
         "brier_poisson": 0.2446,
-        "diferenca": 0.0006
+        "ganho_brier": 0.0006
       },
       "fora": {
         "n": 1235,
         "brier_baseline": 0.2014,
         "brier_poisson": 0.1992,
-        "diferenca": 0.0022
+        "ganho_brier": 0.0022
       }
     },
     "por_terco_temporada": {
@@ -58,19 +59,19 @@
         "n": 818,
         "brier_baseline": 0.2161,
         "brier_poisson": 0.2182,
-        "diferenca": -0.0021
+        "ganho_brier": -0.0021
       },
       "meio": {
         "n": 840,
         "brier_baseline": 0.2265,
         "brier_poisson": 0.2244,
-        "diferenca": 0.0021
+        "ganho_brier": 0.0021
       },
       "fim": {
         "n": 812,
         "brier_baseline": 0.2273,
         "brier_poisson": 0.2231,
-        "diferenca": 0.0042
+        "ganho_brier": 0.0042
       }
     },
     "distribuicao_probabilidades_poisson": {
@@ -90,12 +91,13 @@
     }
   },
   "alvo_sg": {
+    "convencao": "ganho_brier = brier_baseline - brier_modelo (positivo = modelo melhor)",
     "n_rodadas": 126,
     "n_observacoes": 2470,
     "brier_medio_baseline": 0.2021,
     "brier_medio_poisson": 0.2008,
-    "diferenca_media_brier": 0.0014,
-    "diferenca_ic95": [
+    "ganho_brier_medio": 0.0014,
+    "ganho_brier_ic95": [
       -0.0005,
       0.0033
     ],
@@ -106,25 +108,25 @@
         "n": 660,
         "brier_baseline": 0.2115,
         "brier_poisson": 0.2109,
-        "diferenca": 0.0007
+        "ganho_brier": 0.0007
       },
       "2024": {
         "n": 706,
         "brier_baseline": 0.1944,
         "brier_poisson": 0.1926,
-        "diferenca": 0.0018
+        "ganho_brier": 0.0018
       },
       "2025": {
         "n": 694,
         "brier_baseline": 0.2042,
         "brier_poisson": 0.203,
-        "diferenca": 0.0012
+        "ganho_brier": 0.0012
       },
       "2026": {
         "n": 410,
         "brier_baseline": 0.1808,
         "brier_poisson": 0.1785,
-        "diferenca": 0.0023
+        "ganho_brier": 0.0023
       }
     },
     "por_mando": {
@@ -132,13 +134,13 @@
         "n": 1235,
         "brier_baseline": 0.2276,
         "brier_poisson": 0.2243,
-        "diferenca": 0.0033
+        "ganho_brier": 0.0033
       },
       "fora": {
         "n": 1235,
         "brier_baseline": 0.1714,
         "brier_poisson": 0.1718,
-        "diferenca": -0.0005
+        "ganho_brier": -0.0005
       }
     },
     "por_terco_temporada": {
@@ -146,19 +148,19 @@
         "n": 818,
         "brier_baseline": 0.2055,
         "brier_poisson": 0.2035,
-        "diferenca": 0.002
+        "ganho_brier": 0.002
       },
       "meio": {
         "n": 840,
         "brier_baseline": 0.1916,
         "brier_poisson": 0.1919,
-        "diferenca": -0.0003
+        "ganho_brier": -0.0003
       },
       "fim": {
         "n": 812,
         "brier_baseline": 0.2016,
         "brier_poisson": 0.199,
-        "diferenca": 0.0026
+        "ganho_brier": 0.0026
       }
     },
     "distribuicao_probabilidades_poisson": {
