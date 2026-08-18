@@ -226,22 +226,40 @@ def _shotmap_do_jogo(event_id: int) -> dict:
 # ---------------------------------------------------------------------------
 
 def _eventos_da_temporada(season_id: int | None = None) -> list[dict]:
-    """Todos os jogos da temporada — disputados e futuros."""
+    """Todos os jogos da temporada, consultados pela rota oficial por rodada.
+
+    A paginação ``events/last|next`` pode devolver calendário antigo em cache
+    ou IDs cancelados de partidas remarcadas. A rota usada pelo próprio site,
+    ``events/round/{rodada}``, é determinística: dez confrontos por rodada.
+    """
     sid = season_id or SEASON_ID
     eventos, vistos = [], set()
-    for rota in ("last", "next"):
-        for pagina in range(0, 12):
-            d = _get(f"{API}/unique-tournament/{TOURNAMENT_ID}"
-                     f"/season/{sid}/events/{rota}/{pagina}")
-            if not d:
-                break
-            novos = d.get("events", [])
-            for e in novos:
-                if e["id"] not in vistos:
-                    vistos.add(e["id"])
-                    eventos.append(e)
-            if not d.get("hasNextPage"):
-                break
+    rodadas_com_resposta = 0
+    falhas_consecutivas = 0
+    for rodada in range(1, 39):
+        d = _get(
+            f"{API}/unique-tournament/{TOURNAMENT_ID}/season/{sid}"
+            f"/events/round/{rodada}"
+        )
+        if not d:
+            falhas_consecutivas += 1
+            # Servidor sem acesso à API: evita 38 rodadas × tentativas ×
+            # timeout antes de cair com segurança para o cache local.
+            if falhas_consecutivas >= 3:
+                return []
+            continue
+        falhas_consecutivas = 0
+        novos = d.get("events", [])
+        if novos:
+            rodadas_com_resposta += 1
+        for e in novos:
+            if e["id"] not in vistos:
+                vistos.add(e["id"])
+                eventos.append(e)
+
+    # Resposta parcial não pode substituir uma temporada íntegra em cache.
+    if rodadas_com_resposta != 38:
+        return []
     return _deduplicar_eventos(eventos)
 
 

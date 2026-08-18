@@ -80,6 +80,12 @@ try:
         rodadas = sorted(set(m["game_week"] for m in matches_atuais if m.get("game_week", 0) > 0))
         resumo_atual = data_processor.resumo_calendario(matches_atuais)
 
+    st.sidebar.info(
+        f"📚 Base ativa: **{resumo_atual['completos']} jogos concluídos**  \n"
+        f"🏁 Última rodada completa: **{resumo_atual['ultima_rod']}**  \n"
+        f"📅 Próxima rodada: **{resumo_atual['proxima_rod']}**"
+    )
+
     rodada_padrao = resumo_atual["proxima_rod"]
     indice_padrao = rodadas.index(rodada_padrao) if rodada_padrao in rodadas else len(rodadas) - 1
 
