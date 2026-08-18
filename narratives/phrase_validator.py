@@ -179,6 +179,11 @@ FRASES_BANIDAS = (
     # em quase todo parágrafo do motor antigo, e servem pra qualquer time:
     "compondo um cenário propício", "cenário propício para criar",
     "conquistou sg", "conquistar sg", "conquistou nenhum sg",
+    # Gerundismo: o produto usa voz direta. A lista cobre as muletas mais
+    # prováveis sem banir todo gerúndio lexical por acidente.
+    "vem apresentando", "vem mostrando", "vem criando", "vem sofrendo",
+    "vem permitindo", "vem cedendo", "está apresentando", "está mostrando",
+    "segue apresentando", "segue mostrando",
 )
 
 # "apresenta um dos cruzamentos [ofensivos/defensivos] mais completos/favoráveis

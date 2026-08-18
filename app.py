@@ -13,7 +13,7 @@ try:
     import graphic_renderer
     import analytics_engine
     import narrative_engine
-    from sofascore_api import fetch_all_matches
+    from sofascore_api import fetch_all_matches, atualizar_temporada
 
     # ── ESTILO ────────────────────────────────────────────────────────────
     st.markdown("""
@@ -33,23 +33,19 @@ try:
     st.sidebar.header("⚙️ Configurações")
 
     if st.sidebar.button("🔄 Atualizar dados da API"):
-        fetch_all_matches.clear()
-        with st.sidebar:
-            with st.spinner("Buscando dados atualizados..."):
-                matches_fresh = fetch_all_matches()
-        completos   = [m for m in matches_fresh if m["status"] == "complete"]
-        agendados   = [m for m in matches_fresh if m["status"] != "complete"]
-        ultima_rod  = max((m["game_week"] for m in completos), default=0)
-        proxima_rod = min((m["game_week"] for m in agendados), default=0)
-        # Salva no session_state para exibir persistentemente após o rerun
-        st.session_state["ultima_atualizacao"] = {
-            "total":       len(matches_fresh),
-            "completos":   len(completos),
-            "agendados":   len(agendados),
-            "ultima_rod":  ultima_rod,
-            "proxima_rod": proxima_rod,
-        }
-        st.rerun()
+        try:
+            with st.sidebar:
+                with st.spinner("Buscando dados atualizados..."):
+                    matches_fresh = atualizar_temporada()
+            st.session_state["ultima_atualizacao"] = data_processor.resumo_calendario(matches_fresh)
+            st.session_state["atualizacao_erro"] = None
+            st.rerun()
+        except Exception as e:
+            st.session_state["atualizacao_erro"] = str(e)
+            st.session_state.pop("ultima_atualizacao", None)
+
+    if st.session_state.get("atualizacao_erro"):
+        st.sidebar.error(f"❌ Atualização não confirmada: {st.session_state['atualizacao_erro']}")
 
     # Exibe confirmação da última atualização (persiste entre reruns)
     if "ultima_atualizacao" in st.session_state:
@@ -80,12 +76,18 @@ try:
 
     # Carrega rodadas disponíveis da API
     with st.spinner("Carregando calendário da API..."):
-        rodadas = data_processor.get_rodadas_disponiveis()
+        matches_atuais = fetch_all_matches()
+        rodadas = sorted(set(m["game_week"] for m in matches_atuais if m.get("game_week", 0) > 0))
+        resumo_atual = data_processor.resumo_calendario(matches_atuais)
+
+    rodada_padrao = resumo_atual["proxima_rod"]
+    indice_padrao = rodadas.index(rodada_padrao) if rodada_padrao in rodadas else len(rodadas) - 1
 
     rodada_sel = st.sidebar.selectbox(
         "Rodada para análise",
         rodadas,
-        index=min(17, len(rodadas) - 1),   # padrão: rodada 18 (índice 17)
+        index=indice_padrao,
+        key="rodada_para_analise",
     )
 
     n_jogos = st.sidebar.number_input(
@@ -306,10 +308,15 @@ try:
             unsafe_allow_html=True,
         )
         prob = d.get("probabilidade", d["indice"])
+        tipo_def = {
+            "cenario_defensivo": "cenário para SG",
+            "forca_defensiva": "força defensiva sob teste",
+        }.get(d.get("tipo_destaque"))
         st.caption(
             f"{badge} {d['veredito_texto']}  ·  **{prob:.0%}**  ·  "
             f"{d.get('faixa_expectativa', '')}  ·  "
             f"confiança {d.get('confianca_modelo', d['confianca']):.0%}"
+            f"{'  ·  ' + tipo_def if tipo_def else ''}"
         )
 
         # Por que este time está nesta posição — os fatores de maior peso no modelo.

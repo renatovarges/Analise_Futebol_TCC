@@ -242,7 +242,33 @@ def _eventos_da_temporada(season_id: int | None = None) -> list[dict]:
                     eventos.append(e)
             if not d.get("hasNextPage"):
                 break
-    return eventos
+    return _deduplicar_eventos(eventos)
+
+
+def _chave_confronto(j: dict) -> tuple:
+    """Identidade lógica: o SofaScore troca o ID quando remarca uma partida."""
+    rodada = int((j.get("roundInfo") or {}).get("round") or j.get("game_week") or 0)
+    casa = (j.get("homeTeam") or {}).get("name") or j.get("home_name")
+    fora = (j.get("awayTeam") or {}).get("name") or j.get("away_name")
+    return rodada, normalize_team_name(casa), normalize_team_name(fora)
+
+
+def _prioridade_evento(j: dict) -> tuple:
+    status = j.get("status")
+    terminado = (status.get("type") == "finished" if isinstance(status, dict)
+                 else status == "complete")
+    return int(terminado), int(j.get("startTimestamp") or j.get("date_unix") or 0), int(j.get("id") or 0)
+
+
+def _deduplicar_eventos(eventos: list[dict]) -> list[dict]:
+    """Remove IDs obsoletos de partidas remarcadas, preferindo o evento concluído."""
+    por_confronto = {}
+    for evento in eventos:
+        chave = _chave_confronto(evento)
+        atual = por_confronto.get(chave)
+        if atual is None or _prioridade_evento(evento) > _prioridade_evento(atual):
+            por_confronto[chave] = evento
+    return list(por_confronto.values())
 
 
 def _monta_jogo(e: dict, stats: dict, shot: dict) -> dict:
@@ -318,7 +344,8 @@ def _arquivo_cache(season_id: int | None = None) -> Path:
 
 
 def coletar_temporada(forcar: bool = False, progresso=None,
-                      season_id: int | None = None) -> list[dict]:
+                      season_id: int | None = None,
+                      exigir_api: bool = False) -> list[dict]:
     """
     Coleta a temporada inteira. Jogos já disputados e coletados antes não são
     baixados de novo — o cache em disco guarda cada um pelo id.
@@ -337,7 +364,8 @@ def coletar_temporada(forcar: bool = False, progresso=None,
     antigos = {}
     if arq.exists():
         try:
-            antigos = {j["id"]: j for j in json.loads(arq.read_text("utf-8"))}
+            antigos_lista = _deduplicar_eventos(json.loads(arq.read_text("utf-8")))
+            antigos = {j["id"]: j for j in antigos_lista}
         except Exception:
             antigos = {}
 
@@ -346,8 +374,18 @@ def coletar_temporada(forcar: bool = False, progresso=None,
     # SofaScore/Cloudflare às vezes bloqueia o IP de quem chama (comum em
     # servidores de nuvem, como o Streamlit Cloud). Sem isso, uma falha de
     # rede zerava a temporada inteira, sobrescrevendo o cache bom com vazio.
-    if not eventos and antigos:
-        return list(antigos.values())
+    if not eventos:
+        if exigir_api:
+            raise RuntimeError(
+                "A API do SofaScore não respondeu. Os dados locais foram preservados, "
+                "mas não foi possível confirmar uma atualização."
+            )
+        if antigos:
+            limpos = list(antigos.values())
+            # Mesmo sem rede, corrige caches antigos que ainda guardam o ID
+            # cancelado e o substituto de uma mesma partida remarcada.
+            arq.write_text(json.dumps(limpos, ensure_ascii=False), "utf-8")
+            return limpos
 
     jogos, baixados = [], 0
     pendentes = [e for e in eventos
@@ -384,6 +422,13 @@ def coletar_temporada(forcar: bool = False, progresso=None,
 def fetch_all_matches(_v: int = 1) -> list[dict]:
     """Interface que a plataforma consome (mesmo contrato do módulo antigo)."""
     return coletar_temporada()
+
+
+def atualizar_temporada() -> list[dict]:
+    """Atualização explícita, sem mascarar falha de rede como sucesso."""
+    jogos = coletar_temporada(forcar=False, exigir_api=True)
+    fetch_all_matches.clear()
+    return jogos
 
 
 def limpar_cache_disco() -> bool:

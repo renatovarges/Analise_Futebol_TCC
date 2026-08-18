@@ -29,7 +29,7 @@ EXEMPLOS_REFERENCIA = [
     "partida fora. O confronto mantém o São Paulo entre as melhores expectativas "
     "ofensivas da rodada.",
 
-    "A produção de 1,73 de xG em casa encontra uma defesa do Grêmio que vem permitindo "
+    "A produção de 1,73 de xG em casa encontra uma defesa do Grêmio que permite "
     "finalizações perigosas fora. O cenário ofensivo é favorável, embora sem margem "
     "para tratar dois gols como certeza.",
 
@@ -96,6 +96,15 @@ REGRAS INEGOCIÁVEIS
     ordem (próprio primeiro vs. adversário primeiro), verbo de abertura e conector.
 14. Sem títulos, sem marcadores, sem emoji, sem aspas. Só o parágrafo corrido.
 
+14A. NÃO USE GERUNDISMO. Evite construções com "vem + gerúndio", "está + gerúndio",
+    "segue + gerúndio" ou equivalentes. Prefira verbos diretos: "produz", "cede",
+    "permite", "cria", "impõe".
+14B. O campo "diagnostico_confronto" manda no sentido da análise. Não trate posição no
+    ranking como força absoluta. Se a origem for "oportunidade_pelo_adversario", deixe
+    claro que a vantagem nasce do oponente; se for "merito_proprio", atribua o destaque
+    ao time; se for "convergencia", cite o alinhamento dos dois lados; se houver
+    limitação ou ressalva, ela precisa aparecer. "nivel_absoluto" define a intensidade.
+
 15. Além do parágrafo, declare em "fatos_usados" QUAIS campos do dossiê você usou e de
     QUE LADO cada um veio: "sujeito":"proprio" para números do dicionário "numeros_proprios"
     do time analisado, "sujeito":"adversario" para números de "numeros_adversario". Declare
@@ -156,6 +165,12 @@ def _enxugar(d: dict) -> dict:
         # por que o time está nesta posição — as três frentes da análise
         "razoes_da_posicao": d.get("razoes", []),
         "faixa": d.get("faixa_nome"),
+        # Leitura anterior à redação: impede que o texto confunda posição no
+        # ranking com força absoluta e identifica de onde nasce a expectativa.
+        "diagnostico_confronto": d.get("diagnostico", {}),
+        "probabilidade": d.get("probabilidade"),
+        "faixa_expectativa": d.get("faixa_expectativa"),
+        "confianca_modelo": d.get("confianca_modelo"),
     }
 
 
@@ -303,7 +318,7 @@ def _fator_adversario_of(adv_f: dict, rng: random.Random) -> str | None:
     if adv_f.get("gols_sofridos"):
         numericos.append(f"que sofreu {adv_f['gols_sofridos']} gols no recorte")
     qualitativos = [
-        "que vem sofrendo bastante", "que tem cedido espaço no último terço",
+        "que sofre bastante", "que cede espaço no último terço",
         "que tem levado sustos na defesa", "que ainda não achou solidez atrás",
     ]
     if adv_f.get("clean_sheets", 0) == 0:
@@ -323,7 +338,7 @@ def _fator_adversario_def(adv_f: dict, rng: random.Random) -> str | None:
     if adv_f.get("gols"):
         numericos.append(f"que marcou {adv_f['gols']} gols no recorte")
     qualitativos = [
-        "que vem criando bastante perigo", "que tem sido eficiente na conclusão",
+        "que cria bastante perigo", "que mostra eficiência na conclusão",
         "que chega embalado ofensivamente", "que tem levado perigo com frequência",
     ]
     if adv_f.get("gols", 0) >= 4:
@@ -445,6 +460,122 @@ def _redigir_python(dossies: list[dict]) -> dict[str, str]:
         fecho = rng.choice(banco.get(ver, banco["NEUTRO"]))
         f2 = fecho.format(time=time)
 
+        saida[chave_dossie(d)] = f"{f1} {f2}"
+    return saida
+
+
+# Guarda a implementação anterior apenas para auditoria. A definição abaixo
+# passa a ser o motor de produção e elimina a escolha aleatória de evidência.
+_redigir_python_aleatorio = _redigir_python
+
+
+def _leitura_padrao(d: dict) -> dict:
+    """Compatibilidade com dossiês antigos e testes sintéticos."""
+    diag = d.get("diagnostico") or {}
+    if diag:
+        return diag
+    ver = d.get("veredito", "NEUTRO")
+    return {
+        "forca_propria": "favoravel" if ver in ("MUITO_FAVORAVEL", "FAVORAVEL") else "neutro",
+        "efeito_adversario": "desfavoravel" if ver in ("RESSALVA", "ALTA_EXIGENCIA") else "neutro",
+        "origem_expectativa": "merito_proprio" if ver in ("MUITO_FAVORAVEL", "FAVORAVEL") else "equilibrio_com_ressalva",
+        "nivel_absoluto": "alta" if ver == "MUITO_FAVORAVEL" else "moderada",
+    }
+
+
+def _descricao_propria(eixo: str, nivel: str) -> str:
+    if eixo == "ofensivo":
+        return {
+            "favoravel": "a produção própria pesa a favor",
+            "neutro": "a produção própria fica próxima do padrão",
+            "desfavoravel": "a produção própria limita a projeção",
+        }[nivel]
+    return {
+        "favoravel": "a solidez própria pesa a favor",
+        "neutro": "o desempenho defensivo fica próximo do padrão",
+        "desfavoravel": "a defesa própria limita a segurança",
+    }[nivel]
+
+
+def _descricao_adversario(eixo: str, efeito: str, adversario: str) -> str:
+    if eixo == "ofensivo":
+        return {
+            "favoravel": f"a defesa do {adversario} favorece a criação",
+            "neutro": f"a defesa do {adversario} não produz desvio relevante",
+            "desfavoravel": f"a defesa do {adversario} impõe resistência",
+        }[efeito]
+    return {
+        "favoravel": f"o ataque do {adversario} oferece pouca pressão",
+        "neutro": f"o ataque do {adversario} não produz desvio relevante",
+        "desfavoravel": f"o ataque do {adversario} impõe risco",
+    }[efeito]
+
+
+def _conclusao_diagnostico(eixo: str, origem: str, nivel: str, efeito_adv: str) -> str:
+    alta = nivel in ("alta", "muito_alta")
+    if eixo == "ofensivo":
+        textos = {
+            "convergencia": ("Os dois lados sustentam uma expectativa ofensiva alta."
+                              if alta else "Os dois lados favorecem o ataque, mas a expectativa absoluta ainda é moderada."),
+            "merito_proprio": ("A expectativa nasce principalmente da força do próprio ataque, apesar da resistência rival."
+                               if efeito_adv == "desfavoravel" else
+                               "A expectativa nasce principalmente da força do próprio ataque, sem ajuda relevante do adversário."),
+            "oportunidade_pelo_adversario": "A oportunidade nasce mais da fragilidade adversária do que da força do próprio ataque.",
+            "dupla_limitacao": "A posição relativa na rodada não transforma este confronto em uma expectativa ofensiva forte.",
+            "equilibrio_com_ressalva": "Os sinais se compensam e deixam uma expectativa ofensiva condicionada.",
+        }
+    else:
+        textos = {
+            "convergencia": ("Os dois lados sustentam uma expectativa alta de SG."
+                              if alta else "Os dois lados favorecem o SG, mas a expectativa absoluta ainda é moderada."),
+            "merito_proprio": ("A expectativa de SG nasce principalmente da solidez da própria defesa, apesar da exigência rival."
+                               if efeito_adv == "desfavoravel" else
+                               "A expectativa de SG nasce principalmente da solidez da própria defesa, sem ajuda relevante do adversário."),
+            "oportunidade_pelo_adversario": "A oportunidade de SG nasce mais da limitação adversária do que da segurança da própria defesa.",
+            "dupla_limitacao": "A posição relativa na rodada não transforma este confronto em um cenário defensivo seguro.",
+            "equilibrio_com_ressalva": "Os sinais se compensam e deixam a expectativa de SG condicionada.",
+        }
+    return textos[origem]
+
+
+def _evidencia_estrutural_defensiva(d: dict) -> str | None:
+    """Escolhe a evidência de processo que mais favoreceu a defesa no modelo."""
+    dec = d.get("decomposicao") or {}
+    fatos = d["proprio"]
+    candidatos = []
+    regras = (
+        ("grandes_chances_ced", "grandes_chances_cedidas", "{v} grandes chances cedidas por jogo"),
+        ("sot_ced", "chutes_alvo_cedidos", "{v} chutes no alvo permitidos por jogo"),
+        ("chutes_area_ced", "chutes_area_cedidos", "{v} finalizações na área cedidas por jogo"),
+    )
+    for prefixo, campo_fato, molde in regras:
+        contribuicoes = [v for k, v in dec.items() if k.startswith(prefixo)]
+        # No modelo de gols sofridos, contribuição negativa favorece a defesa.
+        favor = -min(contribuicoes, default=0.0)
+        if favor > 0 and fatos.get(campo_fato) is not None:
+            candidatos.append((favor, molde.format(v=_n(fatos[campo_fato], 1))))
+    return max(candidatos, default=(0, None), key=lambda x: x[0])[1]
+
+
+def _redigir_python(dossies: list[dict]) -> dict[str, str]:
+    """Redige a conclusão do diagnóstico, sem sortear a leitura dos dados."""
+    saida = {}
+    for d in dossies:
+        eixo = d["eixo"]
+        prop = d["proprio"]
+        diag = _leitura_padrao(d)
+        valor = _n(prop["xg_medio"] if eixo == "ofensivo" else prop["xga_medio"])
+        metrica = "xG" if eixo == "ofensivo" else "xG cedido"
+        mando = _mando(prop["mando"])
+        proprio = _descricao_propria(eixo, diag["forca_propria"])
+        adversario = _descricao_adversario(eixo, diag["efeito_adversario"], d["adversario"])
+        evidencia = _evidencia_estrutural_defensiva(d) if eixo == "defensivo" else None
+        apoio = f", com {evidencia}" if evidencia else ""
+        f1 = f"Registra {valor} de {metrica} {mando}; {proprio}{apoio}, enquanto {adversario}."
+        f2 = _conclusao_diagnostico(
+            eixo, diag["origem_expectativa"], diag["nivel_absoluto"],
+            diag["efeito_adversario"],
+        )
         saida[chave_dossie(d)] = f"{f1} {f2}"
     return saida
 

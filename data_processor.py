@@ -21,6 +21,34 @@ def get_rodadas_disponiveis() -> list[int]:
     return sorted(set(m["game_week"] for m in matches))
 
 
+def resumo_calendario(matches: list[dict], agora_unix: int | None = None) -> dict:
+    """Resumo sem confundir partidas adiadas com a próxima rodada da agenda."""
+    import time
+    agora = int(agora_unix or time.time())
+    por_rodada = {}
+    for m in matches:
+        if m.get("game_week", 0) > 0:
+            por_rodada.setdefault(m["game_week"], []).append(m)
+
+    completas = [r for r, jogos in por_rodada.items()
+                 if len(jogos) == 10 and all(j["status"] == "complete" for j in jogos)]
+    futuros = [m for m in matches
+               if m["status"] != "complete" and int(m.get("date_unix") or 0) >= agora]
+    if futuros:
+        proxima = min(futuros, key=lambda m: m["date_unix"])["game_week"]
+    else:
+        incompletas = [r for r, jogos in por_rodada.items()
+                       if any(j["status"] != "complete" for j in jogos)]
+        proxima = min(incompletas, default=max(por_rodada, default=1))
+    return {
+        "total": len(matches),
+        "completos": sum(m["status"] == "complete" for m in matches),
+        "agendados": sum(m["status"] != "complete" for m in matches),
+        "ultima_rod": max(completas, default=0),
+        "proxima_rod": proxima,
+    }
+
+
 def get_confrontos_rodada(rodada_num: int) -> list[dict]:
     """Retorna os confrontos de uma rodada com mandante, visitante e status."""
     matches = fetch_all_matches()

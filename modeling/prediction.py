@@ -43,23 +43,25 @@ def _mu_poisson(modelo: dict, linha: dict) -> float:
     return math.exp(max(min(log_mu, 30), -30))   # clip contra overflow
 
 
-def _contribuicoes(modelo: dict, linha: dict, top_n: int = 4) -> list[dict]:
+def _contribuicoes(modelo: dict, linha: dict, top_n: int | None = None) -> list[dict]:
     """Contribuição local de cada feature para o log(mu) — coef × valor padronizado."""
     mean = np.array(modelo["scaler_mean"])
     scale = np.array(modelo["scaler_scale"])
     scale = np.where(scale == 0, 1.0, scale)
     saida = []
     for i, campo in enumerate(modelo["features"]):
-        if campo == "mando_casa":
-            continue
-        valor = linha.get(campo)
+        valor = (float(linha.get("mando") == "casa") if campo == "mando_casa"
+                 else linha.get(campo))
         if valor is None:
             continue
         xs = (valor - mean[i]) / scale[i]
         contrib = modelo["coef"][i] * xs
         saida.append({"metrica": campo, "valor": round(float(valor), 3), "contribuicao": round(float(contrib), 4)})
     saida.sort(key=lambda d: -abs(d["contribuicao"]))
-    return saida[:top_n]
+    # O diagnóstico narrativo precisa enxergar os dois lados do confronto.
+    # Cortar nas quatro maiores contribuições podia eliminar todas as features
+    # do adversário (ou todas as próprias) e fabricar uma explicação unilateral.
+    return saida if top_n is None else saida[:top_n]
 
 
 def _p_2mais_gols(mu: float) -> float:
