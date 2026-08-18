@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from data_processor import resumo_calendario
+import sofascore_api
 from sofascore_api import _deduplicar_eventos
 
 
@@ -52,3 +53,29 @@ def test_proxima_rodada_ignora_partida_antiga_adiada(jogo_factory):
     assert resumo["ultima_rod"] == 22
     assert resumo["proxima_rod"] == 23
 
+
+def test_calendario_consulta_as_38_rotas_por_rodada(monkeypatch):
+    chamadas = []
+
+    def fake_get(url):
+        rodada = int(url.rsplit("/", 1)[-1])
+        chamadas.append(rodada)
+        return {"events": [
+            _evento(rodada * 100 + n, rodada, f"C{n}", f"F{n}", "notstarted", rodada)
+            for n in range(10)
+        ]}
+
+    monkeypatch.setattr(sofascore_api, "_get", fake_get)
+    eventos = sofascore_api._eventos_da_temporada()
+
+    assert chamadas == list(range(1, 39))
+    assert len(eventos) == 380
+
+
+def test_resposta_parcial_da_api_nao_substitui_cache_integro(monkeypatch):
+    def fake_get(url):
+        rodada = int(url.rsplit("/", 1)[-1])
+        return {"events": [_evento(rodada, rodada, "A", "B", "notstarted", rodada)]} if rodada < 38 else None
+
+    monkeypatch.setattr(sofascore_api, "_get", fake_get)
+    assert sofascore_api._eventos_da_temporada() == []
