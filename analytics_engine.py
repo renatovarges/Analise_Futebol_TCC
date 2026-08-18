@@ -700,11 +700,14 @@ ROTULOS_FEATURE_MODELO = {
     "toques_area": "toques na área", "grandes_chances": "grandes chances criadas",
     "xg_ced": "xG cedido", "sot_ced": "chutes no alvo cedidos",
     "chutes_area_ced": "finalizações cedidas na área", "grandes_chances_ced": "grandes chances cedidas",
+    "mando_casa": "efeito de mando",
 }
 
 
 def _rotulo_feature(campo: str) -> str:
     base = campo.replace("adv_", "").rsplit("_j", 1)[0].rsplit("_temporada", 1)[0].rsplit("_ewma", 1)[0]
+    if campo == "mando_casa":
+        return "efeito de mando"
     lado = "do adversário" if campo.startswith("adv_") else "próprio"
     return f"{ROTULOS_FEATURE_MODELO.get(base, base)} ({lado})"
 
@@ -716,6 +719,102 @@ def _razoes_modelo(fatores: list[dict], eixo: str) -> list[str]:
         direcao = "pesa a favor" if f["contribuicao"] > 0 else "pesa contra"
         razoes.append(f"{_rotulo_feature(f['metrica'])} {direcao} da previsão (valor {f['valor']})")
     return razoes
+
+
+def _diagnostico_confronto(pred: dict, fatores: list[dict], eixo: str,
+                           faixas_propria: dict) -> dict:
+    """Traduz a previsão em uma leitura causal estável para a narrativa.
+
+    No ataque, contribuição positiva aumenta gols esperados. Na defesa, o
+    modelo prevê gols sofridos; portanto, contribuição negativa favorece SG.
+    A separação próprio/adversário impede que posição relativa seja narrada
+    como força própria quando a oportunidade nasce apenas do oponente.
+    """
+    sinal_favoravel = 1 if eixo == "ofensivo" else -1
+    proprio = sum(sinal_favoravel * f["contribuicao"] for f in fatores
+                  if not f["metrica"].startswith("adv_")
+                  and f["metrica"] != "mando_casa")
+    adversario = sum(sinal_favoravel * f["contribuicao"] for f in fatores
+                     if f["metrica"].startswith("adv_"))
+    mando = sum(sinal_favoravel * f["contribuicao"] for f in fatores
+                if f["metrica"] == "mando_casa")
+
+    def nivel(v: float) -> str:
+        if v >= 0.035:
+            return "favoravel"
+        if v <= -0.035:
+            return "desfavoravel"
+        return "neutro"
+
+    np, na = nivel(proprio), nivel(adversario)
+    if np == "favoravel" and na == "favoravel":
+        origem = "convergencia"
+    elif np == "favoravel":
+        origem = "merito_proprio"
+    elif na == "favoravel":
+        origem = "oportunidade_pelo_adversario"
+    elif np == "desfavoravel" and na == "desfavoravel":
+        origem = "dupla_limitacao"
+    else:
+        origem = "equilibrio_com_ressalva"
+
+    prob = (pred["probabilidade_2_mais_gols"] if eixo == "ofensivo"
+            else pred["probabilidade_sg"])
+    if prob >= faixas_propria["p90"]:
+        expectativa = "muito_alta"
+    elif prob >= faixas_propria["p75"]:
+        expectativa = "alta"
+    elif prob >= faixas_propria["p50"]:
+        expectativa = "moderada"
+    else:
+        expectativa = "baixa"
+
+    return {
+        "forca_propria": np,
+        "efeito_adversario": na,
+        "origem_expectativa": origem,
+        "nivel_absoluto": expectativa,
+        "saldo_proprio": round(proprio, 4),
+        "saldo_adversario": round(adversario, 4),
+        "saldo_mando": round(mando, 4),
+    }
+
+
+def _selecionar_destaques_defensivos(todos: list[dict], top_n: int) -> list[dict]:
+    """Combina cenário de SG com força defensiva estrutural.
+
+    SG é raro e sofre forte efeito de mando/adversário. Por isso, a vitrine
+    defensiva reserva aproximadamente um terço das vagas às melhores defesas
+    próprias que ficariam ocultas num confronto difícil. O restante continua
+    premiando o cenário completo da partida. A força própria já agrega, pelos
+    coeficientes do modelo, xGA, chutes no alvo/na área e grandes chances.
+    """
+    vagas_forca = max(1, round(top_n / 3))
+    vagas_cenario = top_n - vagas_forca
+    escolhidos = []
+    nomes_escolhidos: set[str] = set()
+
+    for d in todos[:vagas_cenario]:
+        item = {**d, "tipo_destaque": "cenario_defensivo"}
+        escolhidos.append(item)
+        nomes_escolhidos.add(d["time"])
+
+    por_forca = sorted(
+        todos,
+        key=lambda d: -d.get("diagnostico", {}).get("saldo_proprio", -99),
+    )
+    for d in por_forca:
+        if d["time"] in nomes_escolhidos:
+            continue
+        escolhidos.append({**d, "tipo_destaque": "forca_defensiva"})
+        nomes_escolhidos.add(d["time"])
+        if len(escolhidos) == top_n:
+            break
+
+    for pos, d in enumerate(escolhidos, 1):
+        d["posicao_probabilidade"] = d["posicao"]
+        d["posicao"] = pos
+    return escolhidos
 
 
 def _classificar_por_probabilidade(p_propria: float, p_adv_eixo_oposto: float,
@@ -754,6 +853,7 @@ def _dossie_modelo(p: Perfil, adv: Perfil, pred: dict, pred_adv: dict, faixas: d
         fatores = pred["fatores_defesa"]
 
     veredito = _classificar_por_probabilidade(prob, prob_adv_oposto, faixas_propria, faixas_adv)
+    diagnostico = _diagnostico_confronto(pred, fatores, eixo, faixas_propria)
     return {
         "eixo": eixo, "posicao": pos, "time": p.nome, "adversario": adv.nome,
         "mando": p.mando, "mando_adversario": adv.mando,
@@ -767,6 +867,7 @@ def _dossie_modelo(p: Perfil, adv: Perfil, pred: dict, pred_adv: dict, faixas: d
         "jogos_proprio": _rotulos(p), "jogos_adversario": _rotulos(adv),
         "decomposicao": {f["metrica"]: f["contribuicao"] for f in fatores},
         "razoes": _razoes_modelo(fatores, eixo),
+        "diagnostico": diagnostico,
     }
 
 
@@ -838,12 +939,13 @@ def analisar_rodada(confrontos: list[dict], rodada_num: int, n_jogos: int,
                 for i, (p, adv, pred, pred_adv) in enumerate(defs)]
     _marcar_faixas(todos_of)
     _marcar_faixas(todos_def)
+    ranking_defensivo = _selecionar_destaques_defensivos(todos_def, top_n)
 
     return {
         "rodada": rodada_num, "n_jogos": n_jogos, "tipo_filtro": tipo_filtro,
         "janela_curta": JANELA_CURTA, "janela_longa": JANELA_LONGA,
         "ranking_ofensivo": todos_of[:top_n],
-        "ranking_defensivo": todos_def[:top_n],
+        "ranking_defensivo": ranking_defensivo,
         "todos_ofensivos": todos_of, "todos_defensivos": todos_def,
         "confiabilidade": CONFIABILIDADE,
         "modelo": {

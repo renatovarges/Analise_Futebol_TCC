@@ -41,6 +41,27 @@ def test_rodada_real_nao_usa_expressoes_proibidas():
         assert banidas == [], f"{chave}: usa frase banida {banidas} — texto: {texto!r}"
 
 
+def test_rodada_real_nao_usa_gerundismo():
+    _, redacao = _gerar_rodada_real()
+    muletas = ("vem apresentando", "vem mostrando", "vem criando", "vem sofrendo",
+               "vem permitindo", "vem cedendo", "está apresentando", "segue mostrando")
+    for chave, texto in redacao["textos"].items():
+        assert not any(m in texto.lower() for m in muletas), f"{chave}: gerundismo em {texto!r}"
+
+
+def test_todo_destaque_real_recebe_diagnostico_do_confronto():
+    analise, _ = _gerar_rodada_real()
+    for d in analise["ranking_ofensivo"] + analise["ranking_defensivo"]:
+        diag = d.get("diagnostico") or {}
+        assert diag.get("forca_propria") in {"favoravel", "neutro", "desfavoravel"}
+        assert diag.get("efeito_adversario") in {"favoravel", "neutro", "desfavoravel"}
+        assert diag.get("origem_expectativa") in {
+            "convergencia", "merito_proprio", "oportunidade_pelo_adversario",
+            "dupla_limitacao", "equilibrio_com_ressalva",
+        }
+        assert diag.get("nivel_absoluto") in {"baixa", "moderada", "alta", "muito_alta"}
+
+
 def test_rodada_real_nao_usa_conquistou_sg():
     _, redacao = _gerar_rodada_real()
     for chave, texto in redacao["textos"].items():

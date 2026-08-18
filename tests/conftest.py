@@ -14,8 +14,9 @@ CACHE_ATUAL = BASE_DIR / ".cache" / "sofascore_325_87678.json"
 
 @pytest.fixture(scope="session")
 def jogos_reais() -> list[dict]:
+    from sofascore_api import _deduplicar_eventos
     with CACHE_ATUAL.open(encoding="utf-8") as f:
-        return json.load(f)
+        return _deduplicar_eventos(json.load(f))
 
 
 def _jogo(

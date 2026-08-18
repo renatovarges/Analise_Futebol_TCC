@@ -66,7 +66,9 @@ def test_cobertura_por_time_reflete_amostra_real(jogos_reais):
 
 def test_relatorio_qualidade_consolida_tudo(jogos_reais):
     rel = relatorio_qualidade(jogos_reais)
-    assert rel["total_partidas"] == 384
-    assert rel["partidas_completas"] == 205
+    assert rel["total_partidas"] == 380
+    # A temporada avança; o teste valida cobertura mínima sem congelar a
+    # quantidade na rodada em que o fixture foi atualizado pela última vez.
+    assert rel["partidas_completas"] >= 215
     assert rel["partidas_invalidas_schema"] == 0
     assert rel["times_cobertura_alta"] == 20
