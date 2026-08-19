@@ -1,6 +1,11 @@
 # Segredos — nunca subir ao GitHub
 .streamlit/secrets.toml
 
+# soccerdata: só o config/league_dict.json (ensina a liga BRA-Serie A) é
+# versionado; cache e logs gerados em runtime, não.
+.soccerdata/data/
+.soccerdata/logs/
+
 # Python
 __pycache__/
 *.py[cod]
