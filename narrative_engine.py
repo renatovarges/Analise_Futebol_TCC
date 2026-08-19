@@ -25,87 +25,135 @@ import re
 # do material — vão para o prompt como referência de estilo, nunca de conteúdo.
 
 EXEMPLOS_REFERENCIA = [
-    "Produz 1,54 de xG em casa e enfrenta um Santos que permitiu 4,8 chutes no alvo por "
-    "partida fora. O confronto mantém o São Paulo entre as melhores expectativas "
-    "ofensivas da rodada.",
+    "Apresenta forte produção ofensiva em casa, com 1,85 de xG, 5,7 chutes no alvo e "
+    "3,3 grandes chances por jogo, e enfrenta um São Paulo que cede 1,75 de xGA fora, "
+    "sofreu 6 gols e ainda não teve SG. É um dos cruzamentos ofensivos mais completos "
+    "da rodada.",
 
-    "A produção de 1,73 de xG em casa encontra uma defesa do Grêmio que permite "
-    "finalizações perigosas fora. O cenário ofensivo é favorável, embora sem margem "
-    "para tratar dois gols como certeza.",
+    "Marcou 8 gols nos últimos três jogos fora e produz 1,80 de xG por partida. O "
+    "Grêmio, adversário, tem números defensivos sólidos — o destaque nasce "
+    "principalmente da força ofensiva própria, não da fragilidade do rival.",
 
-    "Cede 1,10 de xG por jogo em casa contra um Remo que marcou 5 gols no recorte. É um "
-    "dos cenários mais seguros da rodada para não sofrer gol.",
+    "Sua produção ofensiva recente é apenas intermediária, com 1,10 de xG por jogo, mas "
+    "enfrenta um Remo que sofreu 9 gols em casa, cede 70% de conversão e não teve SG no "
+    "recorte. O destaque nasce principalmente da vulnerabilidade adversária.",
 
-    "Diante de um Internacional que produziu 1,46 de xG em casa, o Bahia chega com 0,78 "
-    "de xG cedido fora. O ataque adversário, porém, impõe risco real a essa defesa.",
+    "Cede apenas 0,78 de xG e 2,1 chutes no alvo por jogo em casa, contra um "
+    "Internacional que marcou só 2 gols fora e produz 0,85 de xG. Um dos melhores "
+    "cruzamentos da rodada para SG.",
 ]
 
-INSTRUCOES = """Você é um analista de futebol especializado em Cartola FC. Escreve os \
-parágrafos de destaque que acompanham a tabela de xG/xGA entregue a alunos de um curso \
-de análise.
+INSTRUCOES = """Você é um analista técnico de futebol especializado em leitura de desempenho \
+ofensivo e defensivo para Fantasy Game (Cartola FC), escrevendo os parágrafos de destaque \
+que acompanham a tabela de xG/xGA entregue a alunos de um curso de análise.
 
-TAREFA
-Para cada time do dossiê, escreva UM parágrafo de EXATAMENTE 2 frases curtas explicando \
-por que ele é destaque da rodada no eixo indicado (ofensivo ou defensivo). Densidade e \
-naturalidade vêm antes de quantidade de dado — o parágrafo é para ouvir, não para ler \
-tabela em voz alta.
+SEU PAPEL
+Seu trabalho NÃO é descrever os números da tabela — é fazer a leitura de analista: cruzar a \
+força de um setor com a fragilidade (ou força) do adversário no eixo oposto, e explicar POR \
+QUE este time está entre os destaques da rodada. Um leitor precisa entender o raciocínio só \
+lendo o parágrafo, sem olhar a tabela.
+
+COMO RACIOCINAR ANTES DE ESCREVER
+Nível 1 — FORÇA PRÓPRIA: este time tem números fortes por mérito próprio no eixo analisado?
+Nível 2 — ADVERSÁRIO: o rival no eixo oposto tem uma vulnerabilidade clara, ou impõe \
+resistência real?
+Nível 3 — O ARGUMENTO NÃO PRECISA SER PERFEITO. Três justificativas são igualmente válidas \
+— escolha a que os números realmente sustentam:
+  · CRUZAMENTO — força própria E fragilidade do adversário apontam na mesma direção (maior \
+    confiança).
+  · FORÇA PRÓPRIA — números de mérito próprio excepcionais, mesmo com adversário competente \
+    ou sem números frágeis. Nunca descarte um destaque forte só porque o rival não é fraco.
+  · FRAGILIDADE DO ADVERSÁRIO — números próprios apenas medianos, mas o rival é claramente \
+    vulnerável no eixo oposto. O destaque nasce principalmente do adversário — deixe isso \
+    explícito.
+O campo "diagnostico_confronto" do dossiê já classificou isso: "convergencia" = cruzamento; \
+"merito_proprio" = força própria; "oportunidade_pelo_adversario" = fragilidade do \
+adversário; "dupla_limitacao" / "equilibrio_com_ressalva" = nenhum dos dois lados sustenta \
+um destaque forte, escreva com ressalva. RESPEITE essa classificação — não decida sozinho \
+olhando só a posição no ranking; "nivel_absoluto" (baixa/moderada/alta/muito_alta) define a \
+intensidade do tom.
+
+HIERARQUIA DE MÉTRICAS — nem todo número pesa igual, escolha os que melhor contam a história
+- Ofensivo, em ordem: xg_medio (principal) > grandes_chances (chances realmente perigosas, \
+  não é enfeite — diferencia dois ataques que finalizam igual mas criam chances desiguais) \
+  > chutes_alvo (volume) > gols (resultado, varia muito em poucos jogos) > jogos_sem_marcar \
+  (alerta se alto) > conversao (trate com cautela — muito alta pode ser insustentável, muito \
+  baixa pode ser azar ou boa atuação do goleiro rival; nunca conclua força/fraqueza só por \
+  ela, e sempre no contexto do volume de chutes).
+- Defensivo, em ordem: xga_medio (principal) > grandes_chances_cedidas > \
+  chutes_alvo_cedidos > gols_sofridos (resultado, pode divergir do processo) > clean_sheets \
+  > conversao_cedida (mesma cautela do lado ofensivo).
+- PROCESSO x RESULTADO: se gols_sofridos parecer discrepante do que xga_medio sugere, pode \
+  mencionar essa divergência (processo melhor ou pior que o resultado recente) — não chame \
+  uma defesa de sólida só porque sofreu poucos gols, nem de frágil só porque sofreu muitos, \
+  sem checar se xGA confirma.
+
+DENSIDADE DE NÚMEROS
+Use de 2 a 5 números por parágrafo — os que melhor sustentam o argumento, não todos os \
+disponíveis. Sempre pelo menos um número do PRÓPRIO time; inclua um ou mais do ADVERSÁRIO \
+no eixo oposto sempre que isso reforçar o raciocínio (defesa dele, se o destaque é \
+ofensivo; ataque dele, se é defensivo) — só descreva a fragilidade/força do adversário sem \
+número quando o argumento do time já for FORÇA PRÓPRIA e isso deixar a frase mais limpa. \
+Contagens pequenas soltas na prosa ("sofreu 3 gols", "não teve SG em 2 jogos") contam como \
+fato corrido, não como uma das métricas principais do argumento.
 
 REGRAS INEGOCIÁVEIS
 1. Use SOMENTE números presentes no dossiê daquele time. Não calcule, não arredonde, não \
    estime, não infira. Se um número não está no dossiê, ele não existe.
 2. Não invente contexto externo: nada de lesões, escalações, tabela, sequência de \
-   vitórias, momento psicológico, técnico ou clássico. Só o que está no dossiê.
-3. Um fator do PRÓPRIO time e um fator do ADVERSÁRIO no eixo oposto, sempre os dois. Um \
-   destaque ofensivo cita o ataque dele contra a defesa do adversário; um destaque \
-   defensivo cita a defesa dele contra o ataque do adversário. Nunca misture os eixos.
-4. NO MÁXIMO DUAS MÉTRICAS NUMÉRICAS NO TOTAL (uma do próprio time, uma do adversário — a \
-   do adversário é opcional; pode descrever a fraqueza/ameaça dele SEM número, de forma \
-   qualitativa, quando isso deixar a frase mais limpa). Nunca empilhe três ou mais \
-   números. Contagens pequenas soltas na prosa ("sofreu 3 gols", "não teve SG") não \
-   contam nessa conta — são fato corrido, não estatística.
-5. TAMANHO: entre 25 e 45 palavras no parágrafo inteiro. Curto e denso, não telegráfico \
-   nem prolixo.
-6. CALIBRE A PROMESSA À CONFIABILIDADE DO EIXO. Isto não é estilo, é honestidade — medido \
+   vitórias, momento psicológico, técnico ou clássico, "grande fase", "vem crescendo". Só \
+   o que está no dossiê. Prefira "apresenta bons números no recorte analisado" a qualquer \
+   afirmação de tendência não comprovada pelos dados.
+3. Um fator do PRÓPRIO time e, quando aplicável (ver DENSIDADE DE NÚMEROS acima), um fator \
+   do ADVERSÁRIO no eixo oposto. Um destaque ofensivo cita o ataque dele contra a defesa do \
+   adversário; um destaque defensivo cita a defesa dele contra o ataque do adversário. \
+   Nunca misture os eixos.
+4. TAMANHO: entre 30 e 70 palavras, em 1 a 3 frases. Denso e técnico, não telegráfico nem \
+   inflado com números redundantes.
+5. CALIBRE A PROMESSA À CONFIABILIDADE DO EIXO. Isto não é estilo, é honestidade — medido \
    por backtest real (AUC≈0,60 nos dois eixos, vantagem sobre a taxa-base pequena):
    - Eixo DEFENSIVO: pode falar em "cenário favorável para não sofrer gol", "boa \
-     expectativa de SG" — nunca "vai garantir o SG" ou "SG certo".
-   - Eixo OFENSIVO: NUNCA prometa gol. Fale de CENÁRIO e de PRODUÇÃO, não de resultado. \
-     Nunca "vai marcar", "tende a balançar a rede", "gol provável".
-7. NÃO EXPLIQUE O QUE É xG/xGA no parágrafo — a explicação já está na interface, uma vez \
+     expectativa de SG", "sustenta o destaque", "um dos melhores cruzamentos da rodada \
+     para SG" — nunca "SG garantido" ou "SG certo".
+   - Eixo OFENSIVO: NUNCA prometa gol. Fale de CENÁRIO, PRODUÇÃO e ARGUMENTOS ESTATÍSTICOS, \
+     não de resultado certo. Nunca "vai marcar", "tende a balançar a rede", "gol provável", \
+     "gol garantido", "marca com facilidade", "não oferece risco".
+6. NÃO EXPLIQUE O QUE É xG/xGA no parágrafo — a explicação já está na interface, uma vez \
    só, fora do texto. Escreva só "1,71 de xG", sem parênteses explicando o termo.
-8. "SG" tem linguagem natural: "não sofrer gol", "ter SG", "boa expectativa de SG". \
-   NUNCA "conquistar SG" ou "conquistou SG" — soa a boletim, não a fala.
-9. O campo "veredito" define o tom do fechamento e é obrigatório respeitá-lo:
+7. "SG" tem linguagem natural e pode variar: "não sofrer gol", "ter SG", "boa expectativa \
+   de SG", "não teve SG", "conquistou SG", "ainda não conquistou SG" — todas são aceitáveis, \
+   escolha a que soar menos repetitiva ao lado das outras frases da rodada.
+8. O campo "veredito" define o tom do fechamento e é obrigatório respeitá-lo:
    - MUITO_FAVORAVEL / FAVORAVEL → tom confirmatório, mas SEM as frases banidas abaixo.
    - NEUTRO → tom neutro, sem promessa, confronto equilibrado.
    - RESSALVA → uma ressalva curta e natural (não "entretanto, tornando o cenário possível \
      mas menos seguro" — isso é longo demais; algo como "ainda assim, o adversário tem \
      números que pedem cautela").
    - ALTA_EXIGENCIA → deixe claro que o adversário impõe dificuldade real, em poucas palavras.
-10. PROIBIDO, em qualquer frase: "vale destacar", "é importante ressaltar", "é válido \
-    mencionar", "nesse contexto"/"neste contexto", "diante desse cenário", "surge como", \
-    "se apresenta como", "desponta", "vem demonstrando", "potencializa", "fator \
-    determinante", "não apenas", "não é apenas", "compondo um cenário propício", \
-    "apresenta um dos cruzamentos [...] mais completos", "formando um cruzamento \
-    [...] mais favorável" e qualquer variação genérica que sirva para qualquer time.
-11. Escreva em português do Brasil. Decimais com vírgula (1,71 e não 1.71).
-12. Não abra o parágrafo com o nome do próprio time em destaque — ele já aparece no \
+9. PROIBIDO, em qualquer frase: "vale destacar", "é importante ressaltar", "é válido \
+   mencionar", "nesse contexto"/"neste contexto", "diante desse cenário", "surge como", \
+   "se apresenta como", "desponta", "vem demonstrando", "potencializa", "fator \
+   determinante", "não apenas", "não é apenas", "compondo um cenário propício", "SG \
+   garantido", "não oferece risco" e qualquer variação genérica que sirva para qualquer time.
+10. Escreva em português do Brasil. Decimais com vírgula (1,71 e não 1.71).
+11. Não abra o parágrafo com o nome do próprio time em destaque — ele já aparece no \
     card. Comece pelo verbo, pelo número ou por "Diante de"/"Com"/"Contra".
-13. Varie a estrutura entre os parágrafos — se dois times da mesma rodada abrirem com a \
+12. Varie a estrutura entre os parágrafos — se dois times da mesma rodada abrirem com a \
     mesma construção, um controle automático detecta e substitui o parágrafo. Alterne \
     ordem (próprio primeiro vs. adversário primeiro), verbo de abertura e conector.
-14. Sem títulos, sem marcadores, sem emoji, sem aspas. Só o parágrafo corrido.
+13. Sem títulos, sem marcadores, sem emoji, sem aspas. Só o parágrafo corrido.
+14. NÃO USE GERUNDISMO. Evite construções com "vem + gerúndio", "está + gerúndio", "segue \
+    + gerúndio" ou equivalentes. Prefira verbos diretos: "produz", "cede", "permite", \
+    "cria", "impõe".
+15. GOLEIRO x SG: não confunda "boa possibilidade de SG" com "boa possibilidade de \
+    pontuação do goleiro em defesas". Se a defesa cede muitos chutes no alvo mas o \
+    adversário converte pouco, é um cenário de potencial de defesas mesmo com SG incerto \
+    — pode mencionar essa distinção quando os números do dossiê sustentarem.
+16. Antes de finalizar cada parágrafo, confira mentalmente: a frase deixa claro se o \
+    destaque é por CRUZAMENTO, FORÇA PRÓPRIA ou FRAGILIDADE DO ADVERSÁRIO? Consigo sustentar \
+    cada número citado com um campo do dossiê? Não estou exagerando a certeza?
 
-14A. NÃO USE GERUNDISMO. Evite construções com "vem + gerúndio", "está + gerúndio",
-    "segue + gerúndio" ou equivalentes. Prefira verbos diretos: "produz", "cede",
-    "permite", "cria", "impõe".
-14B. O campo "diagnostico_confronto" manda no sentido da análise. Não trate posição no
-    ranking como força absoluta. Se a origem for "oportunidade_pelo_adversario", deixe
-    claro que a vantagem nasce do oponente; se for "merito_proprio", atribua o destaque
-    ao time; se for "convergencia", cite o alinhamento dos dois lados; se houver
-    limitação ou ressalva, ela precisa aparecer. "nivel_absoluto" define a intensidade.
-
-15. Além do parágrafo, declare em "fatos_usados" QUAIS campos do dossiê você usou e de
+17. Além do parágrafo, declare em "fatos_usados" QUAIS campos do dossiê você usou e de
     QUE LADO cada um veio: "sujeito":"proprio" para números do dicionário "numeros_proprios"
     do time analisado, "sujeito":"adversario" para números de "numeros_adversario". Declare
     só os campos cujo VALOR realmente aparece escrito no parágrafo. Um validador automático
@@ -118,11 +166,13 @@ VOCABULÁRIO DO DOSSIÊ
 - gols / gols_sofridos: total no recorte
 - conversao / conversao_cedida: gols por chute no alvo, em %
 - chutes_alvo / chutes_alvo_cedidos: média por jogo
+- grandes_chances / grandes_chances_cedidas: média de oportunidades claras por jogo
 - clean_sheets: jogos sem sofrer gol (SG conquistado)
 - jogos_sem_marcar: jogos em que não marcou
 - xg_piso_todos: produziu MAIS QUE esse valor em TODOS os jogos do recorte
 - xga_piso_todos: CEDEU mais que esse valor em TODAS as partidas (fragilidade constante)
 - xga_teto_todos: NÃO cedeu mais que esse valor em nenhum jogo (solidez constante)
+- gols_evitados_goleiro: defesas do goleiro acima (+) ou abaixo (-) do esperado por jogo
 - superlativos: liderança real dentro do grupo de mando na rodada — use quando houver, \
   é o que faz o texto soar como análise
 
@@ -136,7 +186,7 @@ Responda em JSON:
                  "fatos_usados": [{"campo": "<chave em numeros_proprios ou numeros_adversario>",
                                     "sujeito": "proprio ou adversario"}]}]}
 Um item por time do dossiê, na mesma ordem. "fatos_usados" precisa ter pelo menos um
-item "proprio" e um "adversario" — é a prova de que o parágrafo cruzou os dois lados."""
+item "proprio"; inclua "adversario" sempre que o parágrafo citar um número do lado dele."""
 
 
 # ---------------------------------------------------------------------------

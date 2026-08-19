@@ -34,10 +34,19 @@ def test_metrica_cedida_tratada_como_conquistada_e_rejeitada():
     assert any("não existe" in p for p in problemas)
 
 
-def test_falta_lado_adversario_e_rejeitado():
+def test_falta_lado_proprio_e_rejeitado():
+    fatos = [{"campo": "xga_medio", "sujeito": "adversario"}]
+    problemas, _ = checar_atribuicao(fatos, DOSSIE)
+    assert any("próprio time" in p for p in problemas)
+
+
+def test_so_lado_proprio_e_aceito_forca_propria():
+    """Destaque tipo FORÇA_PRÓPRIA pode descrever o adversário sem número —
+    só o fato do próprio time é obrigatório (metodologia de cruzamento,
+    2026-08-19)."""
     fatos = [{"campo": "xg_medio", "sujeito": "proprio"}]
     problemas, _ = checar_atribuicao(fatos, DOSSIE)
-    assert any("cruzar os dois lados" in p for p in problemas)
+    assert problemas == []
 
 
 def test_numero_correto_atribuido_a_equipe_errada():

@@ -75,9 +75,10 @@ def checar_atribuicao(fatos_usados: list[dict], dossie: dict) -> tuple[list[str]
         autorizados |= _formas_aceitas(fonte[campo])
 
     if "proprio" not in sujeitos_vistos:
-        problemas.append("nenhum fato do próprio time declarado — regra 3 exige cruzar os dois lados")
-    if "adversario" not in sujeitos_vistos:
-        problemas.append("nenhum fato do adversário declarado — regra 3 exige cruzar os dois lados")
+        problemas.append("nenhum fato do próprio time declarado — todo parágrafo precisa de pelo menos um número do time analisado")
+    # "adversario" é opcional desde a metodologia de cruzamento (2026-08-19):
+    # um destaque tipo FORÇA_PROPRIA pode descrever o adversário sem número
+    # (ver INSTRUCOES, DENSIDADE DE NÚMEROS) — só o "proprio" é obrigatório.
 
     return problemas, autorizados
 
@@ -123,6 +124,12 @@ _LINGUAGEM_CONFIRMATORIA = (
     # passar falso-negativo (frase correta, marcada como sem tom confirmatório).
     "favor", "propici", "consistent", "segur", "sólid", "solid", "confortáv",
     "reforça", "entre os destaques", "entre as boas expectativas",
+    # ampliado em 2026-08-19 para a metodologia de cruzamento: parágrafos mais
+    # densos e variados confirmam o tom com outras construções ("abrindo uma
+    # oportunidade clara", "o destaque vem sobretudo da força própria",
+    # "menor xGA da rodada") em vez de repetir sempre a mesma palavra-gatilho.
+    "oportunidade", "destaqu", "apoia", "apoiad", "argumento", "expectativa",
+    "menor xga", "menor xg", "melhor", "excelente", "domin",
 )
 
 _LINGUAGEM_RESSALVA = ("porém", "entretanto", "contudo", "no entanto", "apesar")
@@ -178,7 +185,10 @@ FRASES_BANIDAS = (
     # banidas na revisão de 2026-08-06 — viraram muleta genérica, repetida
     # em quase todo parágrafo do motor antigo, e servem pra qualquer time:
     "compondo um cenário propício", "cenário propício para criar",
-    "conquistou sg", "conquistar sg", "conquistou nenhum sg",
+    # "conquistou/conquistar SG" deixou de ser banida em 2026-08-19: a
+    # metodologia de cruzamento (prompt mestre do analista) usa essa
+    # linguagem nos próprios exemplos de voz — é natural, não boletim.
+    "sg garantido", "não oferece risco", "é impossível sofrer gol",
     # Gerundismo: o produto usa voz direta. A lista cobre as muletas mais
     # prováveis sem banir todo gerúndio lexical por acidente.
     "vem apresentando", "vem mostrando", "vem criando", "vem sofrendo",
@@ -210,8 +220,8 @@ def checar_frases_banidas(texto: str) -> list[str]:
 # TAMANHO E DENSIDADE (seção 2 da revisão de 2026-08-06)
 # ---------------------------------------------------------------------------
 
-MIN_PALAVRAS, MAX_PALAVRAS = 20, 55   # janela com folga sobre o alvo de 25-45
-MAX_METRICAS_NUMERICAS = 2
+MIN_PALAVRAS, MAX_PALAVRAS = 20, 85   # janela com folga sobre o alvo de 30-70
+MAX_METRICAS_NUMERICAS = 5            # metodologia de cruzamento: "2 a 5 números relevantes"
 _INTEIROS_LIVRES_DENSIDADE = set(range(0, 12))
 
 
