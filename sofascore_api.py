@@ -96,6 +96,12 @@ def _sofa():
     """Cliente do soccerdata — é ele que atravessa o Cloudflare."""
     global _cliente
     if _cliente is None:
+        import os
+        # Aponta a soccerdata para o config/league_dict.json versionado no
+        # repositório (ensina a liga "BRA-Serie A"), em vez do padrão
+        # ~/soccerdata fora do projeto — sem isso, uma máquina nova (CI,
+        # Streamlit Cloud) não reconhece a liga e a coleta nem começa.
+        os.environ.setdefault("SOCCERDATA_DIR", str(BASE_DIR / ".soccerdata"))
         import soccerdata as sd
         _cliente = sd.Sofascore(leagues=LIGA_SOCCERDATA,
                                 seasons=TEMPORADA_SOCCERDATA)

@@ -15,20 +15,17 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Instala soccerdata
-        run: pip install soccerdata==1.9.0
+      - name: Instala dependências
+        run: pip install soccerdata==1.9.0 streamlit
 
-      - name: Tenta buscar a rodada 24 do SofaScore
+      - name: Tenta buscar a rodada 24 do SofaScore (mesmo código do projeto)
         run: |
           python -c "
-          import soccerdata as sd
-          c = sd.Sofascore(leagues='BRA-Serie A', seasons='2026')
-          try:
-              r = c.get('https://api.sofascore.com/api/v1/unique-tournament/325/season/87678/events/round/24')
-              corpo = r.read()
-              print('SUCESSO — resposta recebida, tamanho:', len(corpo), 'bytes')
-              print(corpo[:300])
-          except Exception as e:
-              print('FALHOU —', type(e).__name__, str(e)[:500])
-              raise
+          from sofascore_api import _get, TOURNAMENT_ID, SEASON_ID, API
+          d = _get(f'{API}/unique-tournament/{TOURNAMENT_ID}/season/{SEASON_ID}/events/round/24')
+          if d and d.get('events'):
+              print('SUCESSO —', len(d['events']), 'eventos recebidos')
+          else:
+              print('FALHOU — nenhuma resposta válida (provável bloqueio da Cloudflare)')
+              raise SystemExit(1)
           "
