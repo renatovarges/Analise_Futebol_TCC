@@ -1,0 +1,34 @@
+name: Teste de acesso ao SofaScore (GitHub Actions)
+
+# Só roda quando disparado manualmente — é um teste de diagnóstico,
+# não faz parte da rotina automática do projeto e não altera nada.
+on:
+  workflow_dispatch:
+
+jobs:
+  testar-acesso:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instala soccerdata
+        run: pip install soccerdata==1.9.0
+
+      - name: Tenta buscar a rodada 24 do SofaScore
+        run: |
+          python -c "
+          import soccerdata as sd
+          c = sd.Sofascore(leagues='BRA-Serie A', seasons='2026')
+          try:
+              r = c.get('https://api.sofascore.com/api/v1/unique-tournament/325/season/87678/events/round/24')
+              corpo = r.read()
+              print('SUCESSO — resposta recebida, tamanho:', len(corpo), 'bytes')
+              print(corpo[:300])
+          except Exception as e:
+              print('FALHOU —', type(e).__name__, str(e)[:500])
+              raise
+          "
