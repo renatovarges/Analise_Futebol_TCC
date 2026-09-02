@@ -1,0 +1,66 @@
+name: Atualizar dados (SofaScore via proxy residencial)
+
+# Roda sozinho, sem depender do PC do Renato ligado nem de estar viajando com
+# notebook — busca os dados mais recentes do SofaScore e publica no GitHub,
+# de onde o Streamlit Cloud serve o site.
+#
+# POR QUE O PROXY (confirmado ao vivo, 02/set/2026): o SofaScore usa
+# Cloudflare, que bloqueia IP de datacenter/nuvem — GitHub Actions cai nessa
+# categoria (testado antes, ver histórico do workflow de diagnóstico já
+# removido). A saída, testada e confirmada funcionando: um proxy residencial
+# (Webshare, plano grátis — 10 IPs, 1GB/mês) faz a chamada parecer vir de uma
+# casa normal em Londres, e a Cloudflare libera. `soccerdata` (o cliente que
+# fala com o SofaScore, em sofascore_api.py) já respeita as variáveis de
+# ambiente padrão HTTP_PROXY/HTTPS_PROXY sozinho — nenhum código mudou, só a
+# variável de ambiente é setada aqui no workflow.
+#
+# VOLUME: uma atualização diária (jogos novos + estatísticas dos que faltam)
+# fica bem abaixo de 1GB/mês — a coleta reaproveita o cache de jogos já
+# baixados (ver `coletar_temporada(forcar=False, ...)` em sofascore_api.py),
+# só busca o que é novo.
+on:
+  schedule:
+    - cron: "0 9 * * *" # 09:00 UTC = 06:00 BRT
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: atualizar-diario
+  cancel-in-progress: false
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Configurar identidade e branch do Git (pro commit automático)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # actions/checkout deixa em detached HEAD por padrão — scripts/atualizar_e_publicar.py
+          # faz `git push` sem argumento nenhum, que exige estar numa branch de
+          # verdade com upstream configurado.
+          git checkout -B main origin/main
+
+      # Chama scripts/atualizar_e_publicar.py — o MESMO script que o
+      # ATUALIZAR_E_PUBLICAR.bat já roda localmente (busca dados novos, e se
+      # algo mudou, comita e dá push sozinho). Rodando aqui com o proxy
+      # setado, ele passa a funcionar de qualquer lugar, sem depender de
+      # notebook nem de rede específica.
+      - name: Buscar dados novos no SofaScore (via proxy) e publicar
+        env:
+          HTTP_PROXY: http://${{ secrets.WEBSHARE_PROXY_USER }}:${{ secrets.WEBSHARE_PROXY_PASS }}@${{ secrets.WEBSHARE_PROXY_HOST }}:${{ secrets.WEBSHARE_PROXY_PORT }}
+          HTTPS_PROXY: http://${{ secrets.WEBSHARE_PROXY_USER }}:${{ secrets.WEBSHARE_PROXY_PASS }}@${{ secrets.WEBSHARE_PROXY_HOST }}:${{ secrets.WEBSHARE_PROXY_PORT }}
+        run: python scripts/atualizar_e_publicar.py
