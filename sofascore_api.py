@@ -103,8 +103,22 @@ def _sofa():
         # Streamlit Cloud) não reconhece a liga e a coleta nem começa.
         os.environ.setdefault("SOCCERDATA_DIR", str(BASE_DIR / ".soccerdata"))
         import soccerdata as sd
+
+        # ACHADO REAL (02/set/2026): o soccerdata NÃO lê HTTP_PROXY/HTTPS_PROXY
+        # do ambiente — o cliente TLS por baixo (tls_requests) só aceita proxy
+        # via parâmetro explícito `proxy=` no construtor do Sofascore. Setar só
+        # a variável de ambiente passa em teste local por engano (a máquina
+        # local já não é bloqueada, o proxy nem chega a ser usado de verdade)
+        # e falha em silêncio na nuvem, onde o bloqueio é real — confirmado ao
+        # vivo rodando de dentro do GitHub Actions (403 direto da SofaScore,
+        # sem passar pelo proxy). SOFASCORE_PROXY (ex.:
+        # "http://usuario:senha@endereco:porta") é setada só no workflow do
+        # GitHub Actions — ausente localmente, por isso `proxy=None` (direto)
+        # continua o padrão em casa.
+        proxy = os.environ.get("SOFASCORE_PROXY") or None
         _cliente = sd.Sofascore(leagues=LIGA_SOCCERDATA,
-                                seasons=TEMPORADA_SOCCERDATA)
+                                seasons=TEMPORADA_SOCCERDATA,
+                                proxy=proxy)
     return _cliente
 
 
