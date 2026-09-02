@@ -1,43 +1,28 @@
 import os
+import tls_requests
 
-proxy = os.environ.get("SOFASCORE_PROXY")
-print("SOFASCORE_PROXY setada?", bool(proxy), "| tamanho:", len(proxy) if proxy else 0)
+# 4 dos 10 IPs grátis do Webshare (Londres, EUA-LA, EUA-Piscataway, Polônia) —
+# testando vários de uma vez pra saber se é o IP específico ou o pool inteiro.
+PROXIES = {
+    "Londres": "http://ufzjirao:wg9po1i7d2dt@31.59.20.176:6754",
+    "EUA-LA": "http://ufzjirao:wg9po1i7d2dt@198.23.243.226:6361",
+    "EUA-Piscataway": "http://ufzjirao:wg9po1i7d2dt@38.154.185.97:6370",
+    "Polonia": "http://ufzjirao:wg9po1i7d2dt@84.247.60.125:6095",
+}
 
-print("\n=== 1) qual IP o tls_requests reporta, via proxy, num site neutro? ===")
-try:
-    import tls_requests
-    r = tls_requests.get("https://api.ipify.org?format=json", proxy=proxy, timeout=15)
-    print("status:", r.status_code, "| corpo:", r.text[:200])
-except Exception as e:
-    print("FALHOU:", type(e).__name__, e)
-
-print("\n=== 2) tls_requests direto no SofaScore, via proxy ===")
-try:
-    import tls_requests
-    r = tls_requests.get(
-        "https://api.sofascore.com/api/v1/unique-tournament/325/season/87678/events/round/1",
-        proxy=proxy, timeout=15,
-    )
-    print("status:", r.status_code, "| corpo:", r.text[:300])
-except Exception as e:
-    print("FALHOU:", type(e).__name__, e)
-
-print("\n=== 3) requests (biblioteca comum, sem spoof de TLS) via proxy, mesmo IP? ===")
-try:
-    import requests
-    r = requests.get("https://api.ipify.org?format=json", proxies={"http": proxy, "https": proxy}, timeout=15)
-    print("status:", r.status_code, "| corpo:", r.text[:200])
-except Exception as e:
-    print("FALHOU:", type(e).__name__, e)
-
-print("\n=== 4) requests direto no SofaScore, via proxy ===")
-try:
-    import requests
-    r = requests.get(
-        "https://api.sofascore.com/api/v1/unique-tournament/325/season/87678/events/round/1",
-        proxies={"http": proxy, "https": proxy}, timeout=15,
-        headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
-    )
-    print("status:", r.status_code, "| corpo:", r.text[:300])
-except Exception as e:
-    print("FALHOU:", type(e).__name__, e)
+for nome, proxy in PROXIES.items():
+    print(f"\n===== {nome} =====")
+    try:
+        r = tls_requests.get("https://api.ipify.org?format=json", proxy=proxy, timeout=15)
+        print("  ping neutro:", r.status_code)
+    except Exception as e:
+        print("  ping neutro FALHOU:", type(e).__name__, e)
+        continue
+    try:
+        r = tls_requests.get(
+            "https://api.sofascore.com/api/v1/unique-tournament/325/season/87678/events/round/1",
+            proxy=proxy, timeout=15,
+        )
+        print("  SofaScore:", r.status_code, "|", r.text[:150])
+    except Exception as e:
+        print("  SofaScore FALHOU:", type(e).__name__, e)
