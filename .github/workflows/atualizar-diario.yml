@@ -22,17 +22,9 @@ name: Atualizar dados (SofaScore via proxy residencial)
 # fica bem abaixo de 1GB/mês — a coleta reaproveita o cache de jogos já
 # baixados (ver `coletar_temporada(forcar=False, ...)` em sofascore_api.py),
 # só busca o que é novo.
-#
-# AGENDAMENTO DESLIGADO POR ENQUANTO (02/set/2026): testado ao vivo contra os
-# 10 IPs do plano grátis do Webshare (4 testados de fato, 3 países
-# diferentes) — o proxy em si funciona (confirmado com 2 clientes HTTP
-# diferentes contra um site neutro), mas o SofaScore bloqueia os 4 mesmo
-# assim. Não é bug de configuração, é o pool de IP grátis do Webshare já
-# conhecido/bloqueado pela Cloudflare deles. O código (`proxy=` explícito em
-# sofascore_api.py) está pronto e correto — só falta um proxy que passe de
-# verdade. Rodar via workflow_dispatch continua funcionando pra testar um
-# proxy novo, sem disparar sozinho enquanto isso não resolver.
 on:
+  schedule:
+    - cron: "0 9 * * *" # 09:00 UTC = 06:00 BRT
   workflow_dispatch: {}
 
 permissions:
