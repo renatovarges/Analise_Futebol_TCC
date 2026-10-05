@@ -39,7 +39,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 
 from data_processor import _calcular_metricas
-from sofascore_api import fetch_all_matches
+from fotmob_api import fetch_all_matches
 
 # ---------------------------------------------------------------------------
 # PARÂMETROS

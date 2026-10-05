@@ -13,7 +13,7 @@ try:
     import graphic_renderer
     import analytics_engine
     import narrative_engine
-    from sofascore_api import fetch_all_matches, atualizar_temporada
+    from fotmob_api import fetch_all_matches, atualizar_temporada
 
     # ── ESTILO ────────────────────────────────────────────────────────────
     st.markdown("""
@@ -194,7 +194,7 @@ try:
     st.title(f"⚽ Análise xG/xGA — Rodada {rodada_sel}")
 
     filtro_label = "por mando" if tipo_filtro == "POR_MANDO" else "gerais"
-    st.caption(f"Dados: SofaScore (Brasileirão 2026)")
+    st.caption(f"Dados: FotMob (Brasileirão 2026)")
     st.info(
         "🎯 **Ranking calculado pelo modelo preditivo** (probabilidade calibrada por "
         "backtest em 4 temporadas). A tabela de análise abaixo mostra o **recorte "
@@ -272,7 +272,7 @@ try:
         "sequencia_sem_sofrer": "Sequência sem sofrer",
         "max_gols_jogo": "Máx. gols num jogo", "max_gs_jogo": "Máx. gols sofridos num jogo",
         "jogos": "Jogos no recorte", "mando": "Mando",
-        # novos — vindos do SofaScore
+        # novos — vindos do FotMob
         "chutes_area": "Finalizações na área/jogo",
         "chutes_area_cedidos": "Finalizações cedidas na área/jogo",
         "toques_area": "Toques na área/jogo",
