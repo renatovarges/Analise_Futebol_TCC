@@ -9,13 +9,23 @@ name: Atualizar dados (FotMob)
 # comum (sem chave, sem proxy, sem disfarce), então este workflow não precisa
 # de nenhum segredo.
 #
-# MODOS (workflow_dispatch):
-#   · publicar = false (padrão): só TESTA se esta máquina consegue ler o FotMob.
-#     Não altera nem publica nada — serve para checar o acesso da nuvem.
-#   · publicar = true: atualiza o cache e publica (só vale rodando na main).
+# QUANDO RODA:
+#   · todo dia às 07:00 UTC (04:00 em Brasília) — pega os jogos da noite anterior.
+#     O GitHub pode atrasar o horário em alguns minutos; é normal.
+#   · manualmente (aba Actions > Run workflow):
+#       publicar = false (padrão): só TESTA o acesso ao FotMob, não publica nada.
+#       publicar = true: atualiza o cache e publica (só vale rodando na main).
 #
-# AGENDAMENTO: desligado. Só liga depois de o modo de teste passar na nuvem.
+# CUSTO: repositório público = Actions gratuito e sem limite de minutos. Não usa
+# chave nem crédito de IA — só baixa dados do FotMob. Se não houver jogo novo,
+# não cria commit.
+#
+# ATENÇÃO: o GitHub desliga agendamentos de repositório sem NENHUMA atividade por
+# 60 dias. Como o robô só comita quando há jogo novo, numa pausa longa (fim de
+# temporada) ele pode ser desligado — é só reativar na aba Actions.
 on:
+  schedule:
+    - cron: "0 7 * * *"
   workflow_dispatch:
     inputs:
       publicar:
@@ -63,8 +73,11 @@ jobs:
           EOF
 
       - name: Atualizar o cache e publicar
-        if: ${{ inputs.publicar && github.ref == 'refs/heads/main' }}
+        if: ${{ (github.event_name == 'schedule' || inputs.publicar) && github.ref == 'refs/heads/main' }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          # actions/checkout deixa em detached HEAD; o script faz `git push` sem
+          # argumentos, que exige estar numa branch com upstream.
+          git checkout -B main origin/main
           python scripts/atualizar_e_publicar.py
