@@ -1,14 +1,14 @@
 """
 data_processor.py — lógica de negócio da plataforma.
 
-Fonte de dados: SofaScore (via sofascore_api.py).
+Fonte de dados: FotMob (via fotmob_api.py).
 
 A FootyStats foi abandonada como fonte analítica em 2026-08-04: o xG dela é
 explicado em 91% apenas pelo número de chutes, e perdia para "chutes no alvo"
 na previsão de gols. Ver o cabeçalho de sofascore_api.py para os números.
 """
 import pandas as pd
-from sofascore_api import fetch_all_matches
+from fotmob_api import fetch_all_matches
 
 
 # ---------------------------------------------------------------------------
@@ -131,7 +131,7 @@ def _calcular_metricas(
         _xga = m["away_xg"]   if is_home else m["home_xg"]
         _sot_conq = m["home_sot"] if is_home else m["away_sot"]
         _sot_ced  = m["away_sot"] if is_home else m["home_sot"]
-        # Grandes chances: finalizações de qualidade clara (SofaScore).
+        # Grandes chances: finalizações de qualidade clara (FotMob).
         # ~96% de cobertura — trata ausência como dado faltante, não zero.
         _gc_conq = m.get("home_big_chances") if is_home else m.get("away_big_chances")
         _gc_ced  = m.get("away_big_chances") if is_home else m.get("home_big_chances")

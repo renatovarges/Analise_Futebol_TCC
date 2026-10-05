@@ -47,8 +47,8 @@ def main() -> None:
     args = ap.parse_args()
 
     # 1. ATUALIZAR DADOS ----------------------------------------------------
-    _passo(1, "Atualizando dados do SofaScore")
-    from sofascore_api import fetch_all_matches, coletar_temporada
+    _passo(1, "Atualizando dados do FotMob")
+    from fotmob_api import fetch_all_matches, coletar_temporada
     # forcar=False (mesmo comportamento do botão "Atualizar dados da API" da
     # UI): jogos completos já em cache não são baixados de novo, só os jogos
     # novos desde a última rodada — muito mais rápido, e o fallback de

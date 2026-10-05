@@ -55,6 +55,7 @@ TEAM_NAME_MAP = {
     "Corinthians": "Corinthians",
     "Atlético Mineiro": "Atletico MG",
     "Atletico Mineiro": "Atletico MG",
+    "Atlético-MG": "Atletico MG",       # grafia do FotMob
     "Coritiba": "Coritiba",
     "São Paulo": "Sao Paulo",
     "Sao Paulo": "Sao Paulo",

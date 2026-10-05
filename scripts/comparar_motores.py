@@ -23,7 +23,7 @@ warnings.filterwarnings("ignore")
 
 import data_processor
 import analytics_engine
-from sofascore_api import fetch_all_matches
+from fotmob_api import fetch_all_matches
 
 ARTIFACTS_DIR = BASE_DIR / "artifacts"
 N_JOGOS, TIPO_FILTRO, TOP_N = 3, "POR_MANDO", 6
