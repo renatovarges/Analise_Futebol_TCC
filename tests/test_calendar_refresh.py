@@ -79,3 +79,24 @@ def test_resposta_parcial_da_api_nao_substitui_cache_integro(monkeypatch):
 
     monkeypatch.setattr(sofascore_api, "_get", fake_get)
     assert sofascore_api._eventos_da_temporada() == []
+
+
+def test_aviso_de_atraso_so_dispara_com_jogo_marcado_no_passado(jogo_factory):
+    from data_processor import jogos_em_atraso
+    agora = 10 * 86400
+    concluido = jogo_factory(1, 1, agora - 5 * 86400, "A", "B", status="complete")
+    atrasado = jogo_factory(2, 2, agora - 3 * 86400, "C", "D", status="incomplete")
+    de_ontem = jogo_factory(3, 3, agora - 20 * 3600, "E", "F", status="incomplete")
+    futuro = jogo_factory(4, 4, agora + 2 * 86400, "G", "H", status="incomplete")
+
+    assert [m["id"] for m in jogos_em_atraso([concluido, atrasado, de_ontem, futuro], agora)] == [2]
+    # pausa longa: só jogos futuros -> nenhum alerta
+    assert jogos_em_atraso([concluido, futuro], agora) == []
+
+
+def test_jogo_cancelado_nao_dispara_aviso_de_atraso(jogo_factory):
+    from data_processor import jogos_em_atraso
+    agora = 10 * 86400
+    cancelado = jogo_factory(1, 21, agora - 40 * 86400, "A", "B", status="incomplete")
+    cancelado["cancelado"] = True
+    assert jogos_em_atraso([cancelado], agora) == []

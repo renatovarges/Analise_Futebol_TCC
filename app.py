@@ -86,6 +86,15 @@ try:
         f"📅 Próxima rodada: **{resumo_atual['proxima_rod']}**"
     )
 
+    atrasados = data_processor.jogos_em_atraso(matches_atuais)
+    if atrasados:
+        st.sidebar.warning(
+            f"⚠️ **Dados possivelmente desatualizados.** {len(atrasados)} jogo(s) já "
+            f"deveriam ter acontecido e ainda não constam como concluídos. A "
+            f"atualização automática pode ter parado — veja a aba Actions do GitHub "
+            f"ou rode o ATUALIZAR_E_PUBLICAR.bat."
+        )
+
     rodada_padrao = resumo_atual["proxima_rod"]
     indice_padrao = rodadas.index(rodada_padrao) if rodada_padrao in rodadas else len(rodadas) - 1
 
