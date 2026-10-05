@@ -280,6 +280,8 @@ def _jogo_incompleto(ev: dict) -> dict:
     j = _jogo_base(ev, False)
     for c in ("home_xg", "away_xg", "home_sot", "away_sot"):
         j[c] = None
+    if ev["cancelado"]:          # adiado/cancelado: não conta como "em atraso"
+        j["cancelado"] = True
     return j
 
 
@@ -396,7 +398,8 @@ def coletar_temporada(forcar: bool = False, progresso=None,
                       f"Baixando jogo {baixados + len(falhas)} de {len(pendentes)}...")
         time.sleep(PAUSA_ENTRE_JOGOS)
 
-    if baixados or not antigos:
+    # grava também quando só mudou o calendário (ex.: jogo adiado/cancelado)
+    if baixados or not antigos or [por_id[i] for i in ordem] != list(antigos.values()):
         _gravar_cache(por_id, ordem)
 
     if falhas and exigir_api:

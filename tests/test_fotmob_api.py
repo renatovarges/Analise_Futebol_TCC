@@ -163,3 +163,8 @@ def test_pagina_de_outro_jogo_e_rejeitada(jogo_real, monkeypatch):
     monkeypatch.setattr(fotmob_api, "_baixar", lambda url, tentativas=3: _pagina_html(jogo_real))
     assert fotmob_api._detalhes(_ev(5103394)) is not None      # a página É deste jogo
     assert fotmob_api._detalhes(_ev(999999)) is None           # a página é de outro jogo
+
+
+def test_jogo_cancelado_e_marcado_no_registro():
+    assert fotmob_api._jogo_incompleto(_ev(1, terminado=False, cancelado=True))["cancelado"] is True
+    assert "cancelado" not in fotmob_api._jogo_incompleto(_ev(2, terminado=False))

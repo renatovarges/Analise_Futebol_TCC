@@ -49,6 +49,24 @@ def resumo_calendario(matches: list[dict], agora_unix: int | None = None) -> dic
     }
 
 
+def jogos_em_atraso(matches: list[dict], agora_unix: int | None = None,
+                    horas: int = 36) -> list[dict]:
+    """
+    Jogos que já deveriam ter acontecido há mais de `horas` e ainda não constam
+    como concluídos — sinal de que a atualização automática parou.
+
+    Pausa longa de campeonato não dispara o alerta (não há jogo marcado no
+    passado). A folga de 36h cobre o intervalo entre o fim da rodada e a
+    atualização das 04:00 (Brasília) do dia seguinte, e jogos recém-terminados
+    cujas estatísticas ainda não saíram no FotMob.
+    """
+    import time
+    limite = int(agora_unix or time.time()) - horas * 3600
+    return [m for m in matches
+            if m["status"] != "complete" and not m.get("cancelado")
+            and 0 < int(m.get("date_unix") or 0) < limite]
+
+
 def get_confrontos_rodada(rodada_num: int) -> list[dict]:
     """Retorna os confrontos de uma rodada com mandante, visitante e status."""
     matches = fetch_all_matches()
